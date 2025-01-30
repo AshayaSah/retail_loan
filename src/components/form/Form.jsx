@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import React, { useEffect, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 
 import { Button } from "../ui/button";
 
@@ -20,15 +20,26 @@ import AppSidebar from "../AppSidebar";
 import Heading from "./form_components/Heading";
 import ApplicantDetails from "./form_components/ApplicantDetails";
 import GuarantorDetails from "./form_components/GuarantorDetails";
+import { GuarantorDetailsTable } from "./form_components/guarantor_details_table/GuarantorDetailsTable";
 
 const Form = () => {
   // Initialize useForm
   const {
+    data,
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { errors, isValid },
   } = useForm();
+
+  // Watch all form values at once
+  const retailLoanData = useWatch({ control });
+
+  // Log all form values whenever they change
+  useEffect(() => {
+    console.log("All Form Values:", retailLoanData);
+  }, [retailLoanData]);
 
   // Helper to handle ShadCN Select values
   const handleSelectChange = (name, value) => {
@@ -58,7 +69,7 @@ const Form = () => {
       icon: Building, // Use a building-related icon for facility details
     },
     {
-      state: false,
+      state: true,
       value: "Preview",
       icon: Eye, // Use an eye icon for preview
     },
@@ -83,23 +94,30 @@ const Form = () => {
         <Heading />
         <form onSubmit={handleSubmit(onSubmit)}>
           <ApplicantDetails
+            data={data}
             register={register}
             errors={errors}
             isValid={isValid}
+            control={control}
+            retailLoanData={retailLoanData}
             handleSelectChange={handleSelectChange}
             stepper={stepper}
             handleStepper={handleStepper}
           />
 
           {stepper[0].state && (
-            <GuarantorDetails
+            <GuarantorDetailsTable
+              data={data}
               register={register}
               errors={errors}
               isValid={isValid}
+              setValue={setValue}
+              control={control}
+              retailLoanData={retailLoanData}
               handleSelectChange={handleSelectChange}
               stepper={stepper}
               handleStepper={handleStepper}
-            />
+            ></GuarantorDetailsTable>
           )}
           {stepper[3].state && (
             <div className="form-section">

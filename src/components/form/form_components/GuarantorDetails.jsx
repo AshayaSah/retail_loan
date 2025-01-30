@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { GuarantorDetailsTable } from "./guarantor_details_table/GuarantorDetailsTable";
 
 const GuarantorDetails = ({
   register,
@@ -19,6 +20,7 @@ const GuarantorDetails = ({
 }) => {
   return (
     <div className="form-section ">
+      <GuarantorDetailsTable></GuarantorDetailsTable>
       <div className="form-section-content-container pt-0">
         <div className="form-section-content">
           <Label htmlFor="firstName">First Name</Label>
