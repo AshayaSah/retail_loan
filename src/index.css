@@ -169,7 +169,7 @@
   }
 
   .form-next-button {
-    @apply flex justify-end;
+    @apply flex justify-end mt-6;
   }
 
 }

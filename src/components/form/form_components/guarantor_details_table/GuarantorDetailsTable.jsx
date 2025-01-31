@@ -479,7 +479,7 @@ export function GuarantorDetailsTable({
 
       {!stepper[1].state && (
         <div className="form-next-button">
-          <Button type="button" onClick={() => handleStepper(1)}>
+          <Button type="submit" onClick={() => handleStepper(1)}>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           </Button>
         </div>

@@ -1,14 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { SidebarTrigger } from "../ui/sidebar";
-
 import Image1 from "../../assets/logo.png";
 import { ModeToggle } from "../ModeToggle";
-
 import { IoPersonOutline } from "react-icons/io5";
 import { CiLock } from "react-icons/ci";
-import { CalendarIcon } from "lucide-react";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "../ui/button";
 import {
@@ -16,6 +12,8 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const NavbarUpdated = () => {
   const [showLoans, setShowLoans] = useState(false);
@@ -24,6 +22,13 @@ const NavbarUpdated = () => {
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  useEffect(() => {
+    AOS.init({
+      duration: 500, // Animation duration in milliseconds
+      once: true,    // Whether animation should happen only once
+    });
+  }, []);
 
   return (
     <div>
@@ -35,16 +40,17 @@ const NavbarUpdated = () => {
                 src={Image1}
                 alt="Logo"
                 className="h-10 mr-2 cursor-pointer"
+                data-aos="fade-down" // Animation for logo
               />
             </Link>
           </div>
           <div className="hidden md:flex justify-center align-middle space-x-7">
-            <Link to="#" className="content-center">
+            <Link to="#" className="content-center" data-aos="fade-down">
               Open Account
             </Link>
             <HoverCard>
               <HoverCardTrigger asChild>
-                <Button variant="link">Loan</Button>
+                <Button variant="link" data-aos="fade-down">Loan</Button>
               </HoverCardTrigger>
               <HoverCardContent className="w-[900px] p-6 shadow-lg rounded-lg">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -102,22 +108,22 @@ const NavbarUpdated = () => {
                 </div>
               </HoverCardContent>
             </HoverCard>
-            <Link to="#" className="content-center">
+            <Link to="#" className="content-center" data-aos="fade-down">
               Credit Cards
             </Link>
-            <Link to="#" className="content-center">
+            <Link to="#" className="content-center" data-aos="fade-down">
               Insure
             </Link>
-            <Link to="#" className="content-center">
+            <Link to="#" className="content-center" data-aos="fade-down">
               Bank with Us
             </Link>
           </div>
           <div className="flex items-center space-x-4">
-            <Button variant="outline" className="flex items-center space-x-2">
+            <Button variant="outline" className="flex items-center space-x-2" data-aos="fade-down">
               <IoPersonOutline />
               <span>Open an Account</span>
             </Button>
-            <Button className="flex items-center space-x-2">
+            <Button className="flex items-center space-x-2" data-aos="fade-down">
               <CiLock />
               <span>Sign In</span>
             </Button>
@@ -130,6 +136,7 @@ const NavbarUpdated = () => {
               variant="outline"
               onClick={toggleMobileMenu}
               className="focus:outline-none md:hidden"
+              data-aos="fade-down"
             >
               <svg
                 className="w-6 h-6"

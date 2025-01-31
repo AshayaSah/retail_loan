@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Image1 from "../../../assets/mountain.jpg"; 
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,7 +20,7 @@ const Heading = () => {
     <div
       className="relative h-[50vh] md:h-[50vh] bg-cover bg-center flex items-end"
       style={{
-        backgroundImage: "url('/placeholder.svg?height=1080&width=1920')",
+        backgroundImage: `url(${Image1})`, 
       }}
     >
       <div className="absolute inset-0 bg-black bg-opacity-40"></div>
@@ -49,7 +50,7 @@ const Heading = () => {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              {/* <AlertDialogCancel>Close</AlertDialogCancel> */}
+              <AlertDialogCancel>Close</AlertDialogCancel>
               <AlertDialogAction onClick={() => setIsOpen(false)}>
                 Close
               </AlertDialogAction>

@@ -14,6 +14,7 @@ import { Controller, useWatch } from "react-hook-form";
 import { Card } from "@/components/ui/card";
 
 const ApplicantDetails = ({
+  handleFetch,
   register,
   errors,
   isValid,
@@ -55,6 +56,7 @@ const ApplicantDetails = ({
             </p>
           )}
         </div>
+
       </div>
 
       {/* Applicant Details Section */}
@@ -76,6 +78,54 @@ const ApplicantDetails = ({
                 </p>
               )}
             </div>
+
+            {/* Email and Phone Number Fields Side by Side */}
+            <div className="flex space-x-4 mt-4">
+              {/* Email Address Field */}
+              <div className="form-section-content flex-1">
+                <Label htmlFor="emails">Email Address</Label>
+                <Input
+                  id="emails"
+                  type="emails"
+                  placeholder="Enter your email"
+                  {...register("emails", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                      message: "Enter a valid email address",
+                    },
+                  })}
+                />
+                {errors.emails && (
+                  <p className="text-red-600 text-sm">{errors.emails.message}</p>
+                )}
+              </div>
+
+              {/* Phone Number Field */}
+              <div className="form-section-content flex-1">
+                <Label htmlFor="phones">Phone Number</Label>
+                <Input
+                  id="phones"
+                  type="tel"
+                  placeholder="Enter your 10-digit phone number"
+                  {...register("phones", {
+                    required: "Phone number is required",
+                    pattern: {
+                      value: /^[0-9]{10}$/,
+                      message: "Phone number must be 10 digits",
+                    },
+                  })}
+                />
+                {errors.phones && (
+                  <p className="text-red-600 text-sm">{errors.phones.message}</p>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="form-section-content">
+            <Button type="button" onClick={() => handleFetch()}>
+              Fetch Data
+            </Button>
           </div>
 
           {/* Personal Information Section  */}
@@ -414,8 +464,8 @@ const ApplicantDetails = ({
       {!stepper[0].state && retailLoanData.is_existing_customer === "YES" && (
         <div className="form-next-button">
           <Button
-            type="submit"
-            onClick={() => (isValid ? handleStepper(0) : null)}
+            type="button"
+            onClick={() => handleStepper(0)}
           >
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           </Button>
