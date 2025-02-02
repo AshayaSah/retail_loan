@@ -5,6 +5,7 @@ import AppSidebar from "../AppSidebar";
 import Heading from "./form_components/Heading";
 import ApplicantDetails from "./form_components/ApplicantDetails";
 import { GuarantorDetailsTable } from "./form_components/guarantor_details_table/GuarantorDetailsTable";
+import { FacilityDetails } from "./form_components/facilityDetails/FacilityDetails";
 import { SecurityDetails } from "./form_components/securityDetails/SecurityDetails";
 import { User, Users, Eye } from "lucide-react";
 
@@ -43,7 +44,6 @@ const Form = () => {
       spouse_name: "None",
     };
 
-    // Set individual values instead of the entire object
     Object.keys(fetchData).forEach((key) => setValue(key, fetchData[key]));
   };
 
@@ -54,6 +54,7 @@ const Form = () => {
   const [stepper, setStepper] = useState([
     { state: false, value: "Applicant Details", icon: User },
     { state: false, value: "Guarantor Details", icon: Users },
+    { state: false, value: "Facility Details", icon: Users },
     { state: false, value: "Security Details", icon: Users },
     { state: false, value: "Preview", icon: Eye },
   ]);
@@ -97,7 +98,22 @@ const Form = () => {
               handleStepper={handleStepper}
             />
           )}
+
           {stepper[1].state && (
+            <FacilityDetails
+              data={data}
+              register={register}
+              errors={errors}
+              isValid={isValid}
+              setValue={setValue}
+              control={control}
+              retailLoanData={retailLoanData}
+              stepper={stepper}
+              handleStepper={handleStepper}
+            />
+          )}
+
+          {stepper[2].state && (
             <SecurityDetails
               data={data}
               register={register}
@@ -110,7 +126,8 @@ const Form = () => {
               handleStepper={handleStepper}
             />
           )}
-          {stepper[2].state && (
+
+          {stepper[3].state && (
             <div className="">
               <Button type="submit" className="form-next-button">
                 Submit Application

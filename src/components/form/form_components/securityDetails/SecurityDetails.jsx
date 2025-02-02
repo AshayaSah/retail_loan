@@ -93,7 +93,7 @@ export function SecurityDetails({
             const updatedGuarantors = [...retailLoanData.securities, newPerson];
             setValue("securities", updatedGuarantors);
 
-            // Clear form data and close the form after adding
+
             setSecurityDetails({
                 account_number: "",
                 name_of_owner: "",
@@ -476,13 +476,13 @@ export function SecurityDetails({
                 </DialogContent>
             </Dialog>
 
-            {!stepper[2].state && (
+            {!stepper[3].state && (
                 <div className="form-next-button">
-                    <Button type="button" onClick={() => handleStepper(2)}>
+                    <Button type="button" onClick={() => handleStepper(3)}>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     </Button>
                 </div>
             )}
         </Card>
     );
-}
+};
