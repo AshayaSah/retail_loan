@@ -63,8 +63,8 @@ export function GuarantorDetailsTable({
       const newPerson = { ...guarantorDetails, id: Date.now() };
       setGuarantors([...guarantors, newPerson]);
 
-      if (!retailLoanData.table_ngjk) {
-        setValue("table_ngjk", [newPerson]);
+      if (!retailLoanData.guarantors) {
+        setValue("guarantors", [newPerson]);
         setGuarantorDetails({
           is_existing_customer: "",
           account_number: "",
@@ -87,8 +87,8 @@ export function GuarantorDetailsTable({
         return;
       }
       // Update retailLoanData to append this person to the guarantors array
-      const updatedGuarantors = [...retailLoanData.table_ngjk, newPerson];
-      setValue("table_ngjk", updatedGuarantors); // This will update the `guarantors` in the useForm hook
+      const updatedGuarantors = [...retailLoanData.guarantors, newPerson];
+      setValue("guarantors", updatedGuarantors); // This will update the `guarantors` in the useForm hook
 
       // Clear form data and close the form after adding
       setGuarantorDetails({
@@ -476,7 +476,7 @@ export function GuarantorDetailsTable({
           </form>
         </DialogContent>
       </Dialog>
-   <div className="">
+
       {!stepper[1].state && (
         <div className="form-next-button">
           <Button type="submit" onClick={() => handleStepper(1)}>
@@ -484,7 +484,6 @@ export function GuarantorDetailsTable({
           </Button>
         </div>
       )}
-   </div>
     </Card>
   );
 }

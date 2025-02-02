@@ -14,6 +14,7 @@ import { Controller, useWatch } from "react-hook-form";
 import { Card } from "@/components/ui/card";
 
 const ApplicantDetails = ({
+  handleFetch,
   register,
   errors,
   isValid,
@@ -28,67 +29,135 @@ const ApplicantDetails = ({
       {/* Check the Existing Customer Section */}
       <div className="form-section-content-container-single py-0">
         <h1 className="form-section-title">Applicant Details</h1>
-        <div className="form-section-content">
-          <Label htmlFor="custom_client_type">
+        {/* <div className="form-section-content">
+          <Label htmlFor="is_existing_customer">
             Are you an Existing CAS Bank Customer?
           </Label>
           <Controller
-            name="custom_client_type"
+            name="is_existing_customer"
             control={control}
             rules={{ required: "This field is required" }}
             render={({ field }) => (
               <RadioGroup onValueChange={field.onChange} value={field.value}>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem
-                    value="Existing"
-                    id="is_existing_customer_yes"
-                  />
-                  <Label htmlFor="is_existing_customer_yes">Existing</Label>
+                  <RadioGroupItem value="YES" id="is_existing_customer_yes" />
+                  <Label htmlFor="is_existing_customer_yes">YES</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem
-                    value="Non-Existing"
-                    id="is_existing_customer_no"
-                  />
-                  <Label htmlFor="is_existing_customer_no">Non-Existing</Label>
+                  <RadioGroupItem value="NO" id="is_existing_customer_no" />
+                  <Label htmlFor="is_existing_customer_no">NO</Label>
                 </div>
               </RadioGroup>
             )}
           />
-          {errors.custom_client_type && (
+          {errors.is_existing_customer && (
             <p className="text-red-600 text-sm">
-              {errors.custom_client_type.message}
+              {errors.is_existing_customer.message}
             </p>
           )}
-        </div>
+        </div> */}
+        <div className="form-section-content">
+        <Label htmlFor="is_existing_customer">
+          Are you an Existing CAS Bank Customer? <span className="text-red-600">*</span>
+        </Label>
+        <Controller
+          name="is_existing_customer"
+          control={control}
+          rules={{ required: "This field is required" }}
+          render={({ field }) => (
+            <Select onValueChange={field.onChange} value={field.value}>
+              <SelectTrigger id="is_existing_customer">
+                <SelectValue placeholder="Select an option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="YES">YES</SelectItem>
+                <SelectItem value="NO">NO</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        />
+        {errors.is_existing_customer && (
+          <p className="text-red-600 text-sm">
+            {errors.is_existing_customer.message}
+          </p>
+        )}
+      </div>
       </div>
 
       {/* Applicant Details Section */}
-      {retailLoanData.custom_client_type === "Existing" && (
+      {retailLoanData.is_existing_customer === "YES" && (
         <>
           {/* Account Number  */}
           <div className="form-section-content-container-single">
             <div className="form-section-content">
-              <Label htmlFor="custom_account_number">Account Number</Label>
+              <Label htmlFor="account_number">Account Number <span className="text-red-600">*</span></Label>
               <Input
-                id="custom_account_number"
-                {...register("custom_account_number", {
+                id="account_number"
+                {...register("account_number", {
                   required: "Please, enter your account number",
                 })}
               />
-              {errors.custom_account_number && (
+              {errors.account_number && (
                 <p className="text-red-600 text-sm">
-                  {errors.custom_account_number.message}
+                  {errors.account_number.message}
                 </p>
               )}
             </div>
+
+            {/* Email and Phone Number Fields Side by Side */}
+            <div className="flex space-x-4 mt-4">
+              {/* Email Address Field */}
+              <div className="form-section-content flex-1">
+                <Label htmlFor="emails">Email Address <span className="text-red-600">*</span></Label>
+                <Input
+                  id="emails"
+                  type="emails"
+                  placeholder="Enter your email"
+                  {...register("emails", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                      message: "Enter a valid email address",
+                    },
+                  })}
+                />
+                {errors.emails && (
+                  <p className="text-red-600 text-sm">{errors.emails.message}</p>
+                )}
+              </div>
+
+              {/* Phone Number Field */}
+              <div className="form-section-content flex-1">
+                <Label htmlFor="phones">Phone Number</Label>
+                <Input
+                  id="phones"
+                  type="tel"
+                  placeholder="Enter your 10-digit phone number"
+                  {...register("phones", {
+                    // required: "Phone number is required",
+                    // pattern: {
+                    //   value: /^[0-9]{10}$/,
+                    //   message: "Phone number must be 10 digits",
+                    // },
+                  })}
+                />
+                {errors.phones && (
+                  <p className="text-red-600 text-sm">{errors.phones.message}</p>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="form-section-content">
+            <Button type="button" onClick={() => handleFetch()}>
+              Fetch Data
+            </Button>
           </div>
 
           {/* Personal Information Section  */}
           <h1 className="form-section-title">Personal Information</h1>
           <div className="form-section-content-container">
             <div className="form-section-content">
-              <Label htmlFor="custom_customer_name">Applicant Full Name</Label>
+              <Label htmlFor="custom_customer_name">Applicant Full Name <span className="text-red-600">*</span></Label>
               <Input
                 id="custom_customer_name"
                 placeholder="Enter your full name"
@@ -111,123 +180,45 @@ const ApplicantDetails = ({
               )}
             </div>
 
-            {/* Email */}
+            {/* Email
             <div className="form-section-content">
               <Label htmlFor="email">Email Address</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="Enter your email"
-                {...register("custom_email", {
-                  required: "Email is required",
-                  pattern: {
-                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-                    message: "Enter a valid email address",
-                  },
+                {...register("email", {
+                  // required: "Email is required",
+                  // pattern: {
+                  //   value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                  //   message: "Enter a valid email address",
+                  // },
                 })}
               />
-              {errors.custom_email && (
-                <p className="text-red-600 text-sm">
-                  {errors.custom_email.message}
-                </p>
+              {errors.email && (
+                <p className="text-red-600 text-sm">{errors.email.message}</p>
               )}
-            </div>
+            </div> */}
 
             {/* Phone Number */}
-            <div className="form-section-content">
+            {/* <div className="form-section-content">
               <Label htmlFor="phone">Phone Number</Label>
               <Input
                 id="phone"
                 type="tel"
                 placeholder="Enter your 10-digit phone number"
-                {...register("custom_contact_no", {
-                  required: "Phone number is required",
-                  pattern: {
-                    value: /^[0-9]{10}$/,
-                    message: "Phone number must be 10 digits",
-                  },
+                {...register("phone", {
+                  // required: "Phone number is required",
+                  // pattern: {
+                  //   value: /^[0-9]{10}$/,
+                  //   message: "Phone number must be 10 digits",
+                  // },
                 })}
               />
-              {errors.custom_contact_no && (
-                <p className="text-red-600 text-sm">
-                  {errors.custom_contact_no.message}
-                </p>
+              {errors.phone && (
+                <p className="text-red-600 text-sm">{errors.phone.message}</p>
               )}
-            </div>
-
-            {/* Expected Loan Amount */}
-            <div className="form-section-content">
-              <Label htmlFor="expected_loan_amount">Expected Loan Amount</Label>
-              <Input
-                id="expected_loan_amount"
-                type="number"
-                placeholder="Enter the expected loan amount"
-                {...register("expected_loan_amount", {
-                  required: "Expected loan amount is required",
-                })}
-              />
-              {errors.expected_loan_amount && (
-                <p className="text-red-600 text-sm">
-                  {errors.expected_loan_amount.message}
-                </p>
-              )}
-            </div>
-
-            {/* Nationality */}
-            <div className="form-section-content">
-              <Label htmlFor="nationality">Nationality</Label>
-              <Input
-                id="nationality"
-                type="text"
-                placeholder="Enter your nationality"
-                defaultValue="Nepali"
-                {...register("nationality", {
-                  required: "Nationality is required",
-                })}
-              />
-              {errors.nationality && (
-                <p className="text-red-600 text-sm">
-                  {errors.nationality.message}
-                </p>
-              )}
-            </div>
-
-            {/* Gender */}
-            <div className="form-section-content">
-              <Label htmlFor="gender">Gender</Label>
-              <select
-                id="gender"
-                {...register("gender", {
-                  required: "Gender is required",
-                })}
-                className="border p-2 rounded w-full"
-              >
-                <option value="">Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </select>
-              {errors.gender && (
-                <p className="text-red-600 text-sm">{errors.gender.message}</p>
-              )}
-            </div>
-
-            {/* Date of Birth */}
-            <div className="form-section-content">
-              <Label htmlFor="date_of_birth">Date of Birth</Label>
-              <Input
-                id="date_of_birth"
-                type="date"
-                {...register("date_of_birth", {
-                  required: "Date of Birth is required",
-                })}
-              />
-              {errors.date_of_birth && (
-                <p className="text-red-600 text-sm">
-                  {errors.date_of_birth.message}
-                </p>
-              )}
-            </div>
+            </div> */}
           </div>
 
           {/* Citizenship and PAN Information Section */}
@@ -236,7 +227,8 @@ const ApplicantDetails = ({
           </h1>
           <div className="form-section-content-container">
             <div className="form-section-content">
-              <Label htmlFor="citizenship_number">Citizenship Number</Label>
+              <Label htmlFor="citizenship_number">Citizenship Number 
+                <span className="text-red-600">*</span></Label>
               <Input
                 id="citizenship_number"
                 type="tel"
@@ -259,11 +251,11 @@ const ApplicantDetails = ({
 
             <div className="form-section-content">
               <Label htmlFor="citizenship_issued_date">
-                Citizenship Issued Date
+                Citizenship Issued Date <span className="text-red-600">*</span>
               </Label>
               <Input
                 id="citizenship_issued_date"
-                type="tel"
+                type="date"
                 placeholder="DD/MM/YYYY"
                 {...register("citizenship_issued_date", {
                   required: "Please, enter your citizenship issued date",
@@ -282,7 +274,7 @@ const ApplicantDetails = ({
 
             <div className="form-section-content">
               <Label htmlFor="citizenship_issued_district">
-                Citizenship Issued District
+                Citizenship Issued District <span className="text-red-600">*</span>
               </Label>
               <Select
                 onValueChange={(value) =>
@@ -320,11 +312,11 @@ const ApplicantDetails = ({
                 type="text"
                 placeholder="Enter your PAN number"
                 {...register("pan_number", {
-                  required: "Please, enter your PAN number",
-                  pattern: {
-                    value: /^[0-9]+$/,
-                    message: "Invalid PAN number. It must be exactly 9 digits.",
-                  },
+                  // required: "Please, enter your PAN number",
+                  // pattern: {
+                  //   value: /^[0-9]+$/,
+                  //   message: "Invalid PAN number. It must be exactly 9 digits.",
+                  // },
                 })}
               />
               {errors.pan_number && (
@@ -351,15 +343,15 @@ const ApplicantDetails = ({
                   <SelectItem value="phd">Ph.D.</SelectItem>
                 </SelectContent>
               </Select>
-              {errors.education && (
+              {/* {errors.education && (
                 <p className="text-red-600 text-sm">
                   {errors.education.message}
                 </p>
-              )}
+              )} */}
             </div>
 
             <div className="form-section-content">
-              <Label htmlFor="experience">Years of Experience</Label>
+              <Label htmlFor="experience">Years of Experience <span className="text-red-600">*</span></Label>
               <Select
                 onValueChange={(value) =>
                   handleSelectChange("experience", value)
@@ -386,29 +378,8 @@ const ApplicantDetails = ({
           {/* Family Information Section */}
           <h1 className="form-section-title">Family Information</h1>
           <div className="form-section-content-container">
-            <div className="form-section-content">
-              <Label htmlFor="grandfathers_name">Grandfather's Name</Label>
-              <Input
-                id="grandfathers_name"
-                placeholder="Enter grandfather's name"
-                {...register("grandfathers_name", {
-                  required: "Grandfather's name is required",
-                  pattern: {
-                    value: /^[A-Za-z\s]+$/,
-                    message:
-                      "Invalid name. Only letters and spaces are allowed.",
-                  },
-                })}
-              />
-              {errors.grandfathers_name && (
-                <p className="text-red-600 text-sm">
-                  {errors.grandfathers_name.message}
-                </p>
-              )}
-            </div>
-
-            <div className="form-section-content">
-              <Label htmlFor="fathers_name">Father's Name</Label>
+          <div className="form-section-content">
+              <Label htmlFor="fathers_name">Father's Name <span className="text-red-600">*</span></Label>
               <Input
                 id="fathers_name"
                 placeholder="Enter father's name"
@@ -429,17 +400,38 @@ const ApplicantDetails = ({
             </div>
 
             <div className="form-section-content">
-              <Label htmlFor="mother_name">Mother's Name</Label>
+              <Label htmlFor="grandfathers_name">Grandfather's Name</Label>
+              <Input
+                id="grandfathers_name"
+                placeholder="Enter grandfather's name"
+                {...register("grandfathers_name", {
+                  // required: "Grandfather's name is required",
+                  // pattern: {
+                  //   value: /^[A-Za-z\s]+$/,
+                  //   message:
+                  //     "Invalid name. Only letters and spaces are allowed.",
+                  // },
+                })}
+              />
+              {errors.grandfathers_name && (
+                <p className="text-red-600 text-sm">
+                  {errors.grandfathers_name.message}
+                </p>
+              )}
+            </div>
+
+            <div className="form-section-content">
+              <Label htmlFor="mother_name">Mother's Name (Optional)</Label>
               <Input
                 id="mother_name"
                 placeholder="Enter mother's name"
                 {...register("mother_name", {
-                  required: "Mother's name is required",
-                  pattern: {
-                    value: /^[A-Za-z\s]+$/,
-                    message:
-                      "Invalid name. Only letters and spaces are allowed.",
-                  },
+                  // required: "Mother's name is required",
+                  // pattern: {
+                  //   value: /^[A-Za-z\s]+$/,
+                  //   message:
+                  //     "Invalid name. Only letters and spaces are allowed.",
+                  // },
                 })}
               />
               {errors.mother_name && (
@@ -455,11 +447,11 @@ const ApplicantDetails = ({
                 id="spouse_name"
                 placeholder="Enter spouse's name (if applicable)"
                 {...register("spouse_name", {
-                  pattern: {
-                    value: /^[A-Za-z\s]*$/,
-                    message:
-                      "Invalid name. Only letters and spaces are allowed.",
-                  },
+                  // pattern: {
+                  //   value: /^[A-Za-z\s]*$/,
+                  //   message:
+                  //     "Invalid name. Only letters and spaces are allowed.",
+                  // },
                 })}
               />
               {errors.spouse_name && (
@@ -480,10 +472,10 @@ const ApplicantDetails = ({
                     value: 0,
                     message: "Number of offsprings cannot be negative",
                   },
-                  max: {
-                    value: 20,
-                    message: "Please enter a reasonable number",
-                  },
+                  // max: {
+                  //   value: 20,
+                  //   message: "Please enter a reasonable number",
+                  // },
                 })}
               />
               {errors.offsprings && (
@@ -495,17 +487,18 @@ const ApplicantDetails = ({
           </div>
         </>
       )}
-      {!stepper[0].state &&
-        retailLoanData.custom_client_type === "Existing" && (
-          <div className="form-next-button">
-            <Button
-              type="button"
-              onClick={() => (isValid ? handleStepper(0) : null)}
-            >
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            </Button>
-          </div>
-        )}
+      <div className="pt-4">
+      {!stepper[0].state && retailLoanData.is_existing_customer === "YES" && (
+        <div className="form-next-button">
+          <Button
+            type="button"
+            onClick={() => handleStepper(0)}
+          >
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          </Button>
+        </div>
+      )}
+      </div>
     </Card>
   );
 };

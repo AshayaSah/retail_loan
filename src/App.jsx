@@ -13,7 +13,7 @@ import { FrappeProvider } from "frappe-react-sdk";
 
 const App = () => {
   return (
-    <FrappeProvider url="http://192.168.10.41" socketPort="9000">
+    
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <SidebarProvider defaultOpen={true}>
           {/* <AppSidebar /> */}
@@ -26,7 +26,7 @@ const App = () => {
           </main>
         </SidebarProvider>
       </ThemeProvider>
-    </FrappeProvider>
+
   );
 };
 

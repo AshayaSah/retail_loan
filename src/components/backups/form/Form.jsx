@@ -3,7 +3,7 @@ import AppSidebar from "../AppSidebar";
 import Heading from "./form_components/Heading";
 import ApplicantDetails from "./form_components/ApplicantDetails";
 
-const Form = () => {
+export default function Form() {
   // Form data.
   const [retailLoanData, setRetailLoanData] = useState({
     firstName: "",
@@ -51,5 +51,3 @@ const Form = () => {
     </div>
   );
 };
-
-export default Form;

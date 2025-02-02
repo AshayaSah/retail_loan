@@ -16,14 +16,16 @@ import {
   User,
   Users,
   Building,
+  Shield,
   Eye,
 } from "lucide-react";
 
 import AppSidebar from "../AppSidebar";
 import Heading from "./form_components/Heading";
 import ApplicantDetails from "./form_components/ApplicantDetails";
-import GuarantorDetails from "./form_components/GuarantorDetails";
 import { GuarantorDetailsTable } from "./form_components/guarantor_details_table/GuarantorDetailsTable";
+import { SecurityDetails } from "./form_components/securityDetails/securityDetails";
+import { FacilityDetails } from "./form_components/facilityDetails/facilityDetails";
 
 const Form = () => {
   // Initialize useForm
@@ -59,13 +61,35 @@ const Form = () => {
     setValue(name, value, { shouldValidate: true });
   };
 
+  const handleFetch = () => {
+    const fetchData = {
+      citizenship_issued_date: "02/12/2321",
+      citizenship_issued_district: "Kathmandu",
+      citizenship_number: "324324",
+      custom_customer_name: "Sakshyam Shrestha",
+      education: "bachelors",
+      email: "sakshyamshrestha111@gmail.com",
+      experience: "0-1",
+      fathers_name: "Suraj",
+      grandfathers_name: "Ambar",
+      is_existing_customer: "YES",
+      mother_name: "Karuna",
+      offsprings: "0",
+      pan_number: "11234",
+      phone: "9808002930",
+      spouse_name: "None",
+    };
+
+    Object.keys(fetchData).forEach((key) => setValue(key, fetchData[key]));
+  };
+
   // Form submission handler
   const onSubmit = (e) => {
     e.preventDefault();
+    console.log("Form Submitted:", retailLoanData);
+    // adddPersonalInfo(retailLoanData);
 
-    adddPersonalInfo(retailLoanData);
-
-    navigate("/");
+    // navigate("/");
   };
 
   // Stepper object to track section completion
@@ -86,7 +110,13 @@ const Form = () => {
       icon: Building, // Use a building-related icon for facility details
     },
     {
-      state: true,
+      state: false,
+      value: "Security Details",
+      icon: Shield,
+    },
+
+    {
+      state: false,
       value: "Preview",
       icon: Eye, // Use an eye icon for preview
     },
@@ -94,6 +124,7 @@ const Form = () => {
 
   // Function to update the stepper state for a specific index
   const handleStepper = (index) => {
+    console.log(index)
     setStepper((prevStepper) =>
       prevStepper.map(
         (step, idx) =>
@@ -109,13 +140,14 @@ const Form = () => {
       <AppSidebar stepper={stepper} />
       <div className="flex-1">
         <Heading />
-        <form onSubmit={(e) => onSubmit(e)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <ApplicantDetails
             data={data}
             register={register}
             errors={errors}
             isValid={isValid}
             control={control}
+            handleFetch={handleFetch}
             retailLoanData={retailLoanData}
             handleSelectChange={handleSelectChange}
             stepper={stepper}
@@ -134,11 +166,42 @@ const Form = () => {
               handleSelectChange={handleSelectChange}
               stepper={stepper}
               handleStepper={handleStepper}
-            ></GuarantorDetailsTable>
+            />
           )}
+          {stepper[1].state && (
+            <FacilityDetails
+              data={data}
+              register={register}
+              errors={errors}
+              isValid={isValid}
+              setValue={setValue}
+              control={control}
+              retailLoanData={retailLoanData}
+              handleSelectChange={handleSelectChange}
+              stepper={stepper}
+              handleStepper={handleStepper} 
+            />
+          )}
+          ,
+          {
+            stepper[2].state && (
+             <SecurityDetails 
+              data={data}
+              register={register}
+              errors={errors}
+              isValid={isValid}
+              setValue={setValue}
+              control={control}
+              retailLoanData={retailLoanData}
+              handleSelectChange={handleSelectChange}
+              stepper={stepper}
+              handleStepper={handleStepper}
+             />
+            )
+          }
           {stepper[3].state && (
             <div className="form-section">
-              <Button type="submit" className="btn-primary w-full">
+              <Button type="button" className="btn-primary w-full">
                 Submit Application
               </Button>
             </div>

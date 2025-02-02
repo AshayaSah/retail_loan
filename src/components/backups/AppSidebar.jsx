@@ -52,7 +52,7 @@ const AppSidebar = () => {
           <ModeToggle></ModeToggle>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel className='text-2xl font-bold' >Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
