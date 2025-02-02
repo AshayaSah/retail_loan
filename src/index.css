@@ -148,21 +148,39 @@
     @apply w-[90%] mx-auto mb-6 p-4 shadow-lg rounded-lg ;
   }
 
-  .form-section-content-container {
+  /* .form-section-content-container {
     @apply grid md:grid-cols-2 sm:grid-cols-1 gap-x-6 gap-y-4 py-6 rounded-b-[1rem];
-  }
+  } */
 
-  .form-section-content-container-single{
+  /* .form-section-content-container-single{
     @apply grid sm:grid-cols-1 gap-x-6 gap-y-4 py-6 rounded-b-[1rem];
-  }
+  } */
 
-  .form-section-title{
+  /* .form-section-title{
     @apply text-2xl font-bold pt-2
-  }
+  } */
 
-  .form-section-content {
-    @apply flex flex-col gap-1;
+
+  .form-section-title {
+    @apply text-2xl font-bold pt-2 text-primary tracking-wide relative pb-2 border-b border-muted transition-all ease-in-out duration-500;
   }
+  
+  .form-section-title::after {
+    @apply content-[''] block w-24 h-[3px] bg-primary rounded-full absolute bottom-0 left-0 transform scale-x-0 origin-left transition-all ease-in-out duration-500;
+  }
+  
+  .form-section-title:hover::after {
+    @apply scale-x-100;
+  }
+  
+  
+  
+  
+
+  /* .form-section-content {
+    @apply flex flex-col gap-1;
+  } */
+
 
   Label {
     @apply p-2;
@@ -172,4 +190,120 @@
     @apply flex justify-end mt-6;
   }
 
+
+
+
+/* Form section containers */
+.form-section-content-container {
+  @apply grid md:grid-cols-2 sm:grid-cols-1 gap-x-3 gap-y-2 py-3 rounded-b-[1rem];
+}
+
+.form-section-content-container-single {
+  @apply grid sm:grid-cols-1 gap-y-2 py-3 rounded-b-[1rem];
+}
+
+/* Form content with subtle animation */
+.form-section-content {
+  @apply flex flex-col gap-1 px-3 py-2 bg-white opacity-0 transform translate-y-4 transition-all duration-500 ease-in-out;
+  animation: slideIn 0.7s ease-in-out forwards;
+}
+
+.form-section-content:nth-child(odd) {
+  animation-delay: 0.2s;
+}
+
+.form-section-content:nth-child(even) {
+  animation-delay: 0.4s;
+}
+
+/* Animation for smooth fade-in and slide */
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Labels */
+.form-section-content label {
+  @apply text-base font-medium text-primary;
+}
+
+/* Inputs, Selects, and Textareas */
+.form-section-content input,
+.form-section-content select,
+.form-section-content textarea {
+  @apply mt-1 p-2 rounded-md border border-muted focus:ring-2 focus:ring-primary focus:outline-none transition-all duration-200 ease-in-out;
+}
+
+.form-section-content input:focus,
+.form-section-content select:focus,
+.form-section-content textarea:focus {
+  @apply border-primary;
+}
+
+.form-section-content input:hover,
+.form-section-content select:hover,
+.form-section-content textarea:hover {
+  @apply ring-2 ring-primary/30;
+}
+
+/* Error messages */
+.form-section-content .error-message {
+  @apply text-sm text-red-600;
+}
+
+/* Checkbox Container (ShadCN Checkbox) */
+.checkbox-container {
+  @apply flex items-center space-x-2 opacity-0 transform translate-y-2 transition-all duration-500 ease-in-out;
+  animation: fadeSlideUp 0.5s forwards;
+}
+
+.checkbox-container label {
+  @apply text-base font-medium text-primary cursor-pointer transition-all duration-200;
+}
+
+.checkbox-container .shadcn-checkbox {
+  @apply transition-all duration-200 ease-in-out border-muted rounded-md focus:ring-primary focus:ring-2 hover:ring-primary/30;
+}
+
+
+
+/* Fancy Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+/* Scrollbar Track */
+::-webkit-scrollbar-track {
+  @apply bg-muted/40 rounded-lg;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollbar Thumb */
+::-webkit-scrollbar-thumb {
+  @apply bg-gradient-to-br from-primary via-primary/80 to-primary/50 rounded-full;
+  border: 2px solid theme("colors.background");
+  transition: all 0.3s ease-in-out;
+}
+
+/* Scrollbar Thumb (Hover Effect) */
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gradient-to-br from-primary/90 via-primary to-primary/70;
+  border-color: theme("colors.primary");
+  transform: scale(1.1);
+}
+
+/* Firefox Support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: theme("colors.primary") theme("colors.muted/40");
+}
+
+  
 }

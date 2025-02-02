@@ -1,6 +1,6 @@
 import React from "react";
 import { Calendar, Check, Home, Inbox, Search, Settings } from "lucide-react";
-
+import Logo from "@/assets/logo.png";
 import {
   Sidebar,
   SidebarContent,
@@ -20,10 +20,13 @@ const AppSidebar = ({ stepper }) => {
       <SidebarContent>
         <SidebarGroup>
           <SidebarTrigger />
-          <ModeToggle></ModeToggle>
+          <img src={Logo} alt="" />
+          {/* <ModeToggle></ModeToggle> */}
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-">
+            Home Loan Form
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {stepper.map((item) => (

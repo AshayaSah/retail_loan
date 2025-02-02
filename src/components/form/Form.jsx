@@ -20,15 +20,26 @@ import {
   Eye,
 } from "lucide-react";
 
+import { AlertCircle } from "lucide-react";
+
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
 import AppSidebar from "../AppSidebar";
 import Heading from "./form_components/Heading";
 import ApplicantDetails from "./form_components/ApplicantDetails";
 import { GuarantorDetailsTable } from "./form_components/guarantor_details_table/GuarantorDetailsTable";
 import { SecurityDetails } from "./form_components/securityDetails/securityDetails";
-import { FacilityDetails } from "./form_components/facilityDetails/facilityDetails";
+import { FacilityDetails } from "./form_components/facilityDetails/FacilityDetails";
+import { Label } from "@radix-ui/react-dropdown-menu";
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@radix-ui/react-toast";
+import { Toaster } from "../ui/toaster";
 
 const Form = () => {
   // Initialize useForm
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const {
     data,
     register,
@@ -47,6 +58,7 @@ const Form = () => {
   } = useAppStore();
 
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   // Watch all form values at once
   const retailLoanData = useWatch({ control });
@@ -62,25 +74,36 @@ const Form = () => {
   };
 
   const handleFetch = () => {
-    const fetchData = {
-      citizenship_issued_date: "02/12/2321",
-      citizenship_issued_district: "Kathmandu",
-      citizenship_number: "324324",
-      custom_customer_name: "Sakshyam Shrestha",
-      education: "bachelors",
-      email: "sakshyamshrestha111@gmail.com",
-      experience: "0-1",
-      fathers_name: "Suraj",
-      grandfathers_name: "Ambar",
-      is_existing_customer: "YES",
-      mother_name: "Karuna",
-      offsprings: "0",
-      pan_number: "11234",
-      phone: "9808002930",
-      spouse_name: "None",
-    };
+    if (
+      retailLoanData.account_number == "13420002008" &&
+      retailLoanData.phone == "9810126827"
+    ) {
+      setError(false);
+      setLoading(true);
+      setTimeout(() => {
+        const fetchData = {
+          citizenship_issued_date: "2020-08-26",
+          citizenship_issued_district: "Kathmandu",
+          citizenship_number: "324324",
+          custom_customer_name: "Sakshyam Shrestha",
+          education: "bachelors",
+          email: "sakshyamshrestha111@gmail.com",
+          experience: "0-1",
+          fathers_name: "Suraj Raj Shrestha",
+          grandfathers_name: "Ambar Bahadur Raj Shrestha",
+          mother_name: "Karuna Shrestha",
+          offsprings: "2",
+          pan_number: "10241234",
+          spouse_name: "None",
+        };
 
-    Object.keys(fetchData).forEach((key) => setValue(key, fetchData[key]));
+        Object.keys(fetchData).forEach((key) => setValue(key, fetchData[key]));
+
+        setLoading(false);
+      }, [1000]);
+    } else {
+      return setError(true);
+    }
   };
 
   // Form submission handler
@@ -124,7 +147,7 @@ const Form = () => {
 
   // Function to update the stepper state for a specific index
   const handleStepper = (index) => {
-    console.log(index)
+    console.log(index);
     setStepper((prevStepper) =>
       prevStepper.map(
         (step, idx) =>
@@ -143,9 +166,12 @@ const Form = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <ApplicantDetails
             data={data}
+            loading={loading}
+            error={error}
             register={register}
             errors={errors}
             isValid={isValid}
+            setValue={setValue}
             control={control}
             handleFetch={handleFetch}
             retailLoanData={retailLoanData}
@@ -179,13 +205,11 @@ const Form = () => {
               retailLoanData={retailLoanData}
               handleSelectChange={handleSelectChange}
               stepper={stepper}
-              handleStepper={handleStepper} 
+              handleStepper={handleStepper}
             />
           )}
-          ,
-          {
-            stepper[2].state && (
-             <SecurityDetails 
+          {stepper[2].state && (
+            <SecurityDetails
               data={data}
               register={register}
               errors={errors}
@@ -196,12 +220,14 @@ const Form = () => {
               handleSelectChange={handleSelectChange}
               stepper={stepper}
               handleStepper={handleStepper}
-             />
-            )
-          }
+            />
+          )}
           {stepper[3].state && (
-            <div className="form-section">
-              <Button type="button" className="btn-primary w-full">
+            <div className="form-section flex justify-end space-x-4">
+              <Button variant="outline" type="button" className="">
+                Cancel
+              </Button>
+              <Button type="button" className="">
                 Submit Application
               </Button>
             </div>
