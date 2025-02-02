@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
+import { useAppStore } from "../../zustand/useStore";
+import { useNavigate } from "react-router-dom";
+
 import { Button } from "../ui/button";
 
 import {
@@ -33,6 +36,16 @@ const Form = () => {
     formState: { errors, isValid },
   } = useForm();
 
+  const {
+    currentEdit,
+    addPersonalInfo,
+    updatePersonalInfo,
+    clearCurrentEdit,
+    adddPersonalInfo,
+  } = useAppStore();
+
+  const navigate = useNavigate();
+
   // Watch all form values at once
   const retailLoanData = useWatch({ control });
 
@@ -47,8 +60,12 @@ const Form = () => {
   };
 
   // Form submission handler
-  const onSubmit = (data) => {
-    console.log("Form Submitted Data:", data);
+  const onSubmit = (e) => {
+    e.preventDefault();
+
+    adddPersonalInfo(retailLoanData);
+
+    navigate("/");
   };
 
   // Stepper object to track section completion
@@ -92,7 +109,7 @@ const Form = () => {
       <AppSidebar stepper={stepper} />
       <div className="flex-1">
         <Heading />
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={(e) => onSubmit(e)}>
           <ApplicantDetails
             data={data}
             register={register}

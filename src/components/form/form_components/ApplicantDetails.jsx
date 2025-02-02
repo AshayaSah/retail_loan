@@ -29,50 +29,56 @@ const ApplicantDetails = ({
       <div className="form-section-content-container-single py-0">
         <h1 className="form-section-title">Applicant Details</h1>
         <div className="form-section-content">
-          <Label htmlFor="is_existing_customer">
+          <Label htmlFor="custom_client_type">
             Are you an Existing CAS Bank Customer?
           </Label>
           <Controller
-            name="is_existing_customer"
+            name="custom_client_type"
             control={control}
             rules={{ required: "This field is required" }}
             render={({ field }) => (
               <RadioGroup onValueChange={field.onChange} value={field.value}>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="YES" id="is_existing_customer_yes" />
-                  <Label htmlFor="is_existing_customer_yes">YES</Label>
+                  <RadioGroupItem
+                    value="Existing"
+                    id="is_existing_customer_yes"
+                  />
+                  <Label htmlFor="is_existing_customer_yes">Existing</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="NO" id="is_existing_customer_no" />
-                  <Label htmlFor="is_existing_customer_no">NO</Label>
+                  <RadioGroupItem
+                    value="Non-Existing"
+                    id="is_existing_customer_no"
+                  />
+                  <Label htmlFor="is_existing_customer_no">Non-Existing</Label>
                 </div>
               </RadioGroup>
             )}
           />
-          {errors.is_existing_customer && (
+          {errors.custom_client_type && (
             <p className="text-red-600 text-sm">
-              {errors.is_existing_customer.message}
+              {errors.custom_client_type.message}
             </p>
           )}
         </div>
       </div>
 
       {/* Applicant Details Section */}
-      {retailLoanData.is_existing_customer === "YES" && (
+      {retailLoanData.custom_client_type === "Existing" && (
         <>
           {/* Account Number  */}
           <div className="form-section-content-container-single">
             <div className="form-section-content">
-              <Label htmlFor="account_number">Account Number</Label>
+              <Label htmlFor="custom_account_number">Account Number</Label>
               <Input
-                id="account_number"
-                {...register("account_number", {
+                id="custom_account_number"
+                {...register("custom_account_number", {
                   required: "Please, enter your account number",
                 })}
               />
-              {errors.account_number && (
+              {errors.custom_account_number && (
                 <p className="text-red-600 text-sm">
-                  {errors.account_number.message}
+                  {errors.custom_account_number.message}
                 </p>
               )}
             </div>
@@ -112,7 +118,7 @@ const ApplicantDetails = ({
                 id="email"
                 type="email"
                 placeholder="Enter your email"
-                {...register("email", {
+                {...register("custom_email", {
                   required: "Email is required",
                   pattern: {
                     value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
@@ -120,8 +126,10 @@ const ApplicantDetails = ({
                   },
                 })}
               />
-              {errors.email && (
-                <p className="text-red-600 text-sm">{errors.email.message}</p>
+              {errors.custom_email && (
+                <p className="text-red-600 text-sm">
+                  {errors.custom_email.message}
+                </p>
               )}
             </div>
 
@@ -132,7 +140,7 @@ const ApplicantDetails = ({
                 id="phone"
                 type="tel"
                 placeholder="Enter your 10-digit phone number"
-                {...register("phone", {
+                {...register("custom_contact_no", {
                   required: "Phone number is required",
                   pattern: {
                     value: /^[0-9]{10}$/,
@@ -140,8 +148,84 @@ const ApplicantDetails = ({
                   },
                 })}
               />
-              {errors.phone && (
-                <p className="text-red-600 text-sm">{errors.phone.message}</p>
+              {errors.custom_contact_no && (
+                <p className="text-red-600 text-sm">
+                  {errors.custom_contact_no.message}
+                </p>
+              )}
+            </div>
+
+            {/* Expected Loan Amount */}
+            <div className="form-section-content">
+              <Label htmlFor="expected_loan_amount">Expected Loan Amount</Label>
+              <Input
+                id="expected_loan_amount"
+                type="number"
+                placeholder="Enter the expected loan amount"
+                {...register("expected_loan_amount", {
+                  required: "Expected loan amount is required",
+                })}
+              />
+              {errors.expected_loan_amount && (
+                <p className="text-red-600 text-sm">
+                  {errors.expected_loan_amount.message}
+                </p>
+              )}
+            </div>
+
+            {/* Nationality */}
+            <div className="form-section-content">
+              <Label htmlFor="nationality">Nationality</Label>
+              <Input
+                id="nationality"
+                type="text"
+                placeholder="Enter your nationality"
+                defaultValue="Nepali"
+                {...register("nationality", {
+                  required: "Nationality is required",
+                })}
+              />
+              {errors.nationality && (
+                <p className="text-red-600 text-sm">
+                  {errors.nationality.message}
+                </p>
+              )}
+            </div>
+
+            {/* Gender */}
+            <div className="form-section-content">
+              <Label htmlFor="gender">Gender</Label>
+              <select
+                id="gender"
+                {...register("gender", {
+                  required: "Gender is required",
+                })}
+                className="border p-2 rounded w-full"
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+              {errors.gender && (
+                <p className="text-red-600 text-sm">{errors.gender.message}</p>
+              )}
+            </div>
+
+            {/* Date of Birth */}
+            <div className="form-section-content">
+              <Label htmlFor="date_of_birth">Date of Birth</Label>
+              <Input
+                id="date_of_birth"
+                type="date"
+                {...register("date_of_birth", {
+                  required: "Date of Birth is required",
+                })}
+              />
+              {errors.date_of_birth && (
+                <p className="text-red-600 text-sm">
+                  {errors.date_of_birth.message}
+                </p>
               )}
             </div>
           </div>
@@ -411,16 +495,17 @@ const ApplicantDetails = ({
           </div>
         </>
       )}
-      {!stepper[0].state && retailLoanData.is_existing_customer === "YES" && (
-        <div className="form-next-button">
-          <Button
-            type="submit"
-            onClick={() => (isValid ? handleStepper(0) : null)}
-          >
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          </Button>
-        </div>
-      )}
+      {!stepper[0].state &&
+        retailLoanData.custom_client_type === "Existing" && (
+          <div className="form-next-button">
+            <Button
+              type="button"
+              onClick={() => (isValid ? handleStepper(0) : null)}
+            >
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </Button>
+          </div>
+        )}
     </Card>
   );
 };
