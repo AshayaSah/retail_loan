@@ -68,7 +68,7 @@ const ApplicantDetails = ({
         {/* Is Existing Customer  */}
         <div className="form-section-content">
           <Label htmlFor="custom_client_type">
-            Are you an Existing CAS Bank Customer?{" "}
+            Are you an Existing Customer?{" "}
             <span className="text-red-600">*</span>
           </Label>
           <Controller
@@ -81,8 +81,8 @@ const ApplicantDetails = ({
                   <SelectValue placeholder="Select an option" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Existing">YES</SelectItem>
-                  <SelectItem value="Non-Existing">NO</SelectItem>
+                  <SelectItem value="Existing">Existing</SelectItem>
+                  <SelectItem value="Non-Existing">Non-Existing</SelectItem>
                 </SelectContent>
               </Select>
             )}
@@ -92,6 +92,17 @@ const ApplicantDetails = ({
               {errors.custom_client_type.message}
             </p>
           )}
+          {retailLoanData.custom_client_type == "Non-Existing" ?
+            <div className="form-section-content-container-single pt-6">
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Not Eligible</AlertTitle>
+                <AlertDescription>
+                  You must be a CAS Bank Customer to apply for Loan.
+                </AlertDescription>
+              </Alert>
+            </div> : null
+          }
         </div>
       </div>
 
@@ -101,12 +112,12 @@ const ApplicantDetails = ({
           {/* Email Address Field */}
           <div className="form-section-content ">
             <Label htmlFor="expected_loan_amount">
-              Expected Loan Ammount <span className="text-red-600">*</span>
+              Expected Loan Amount <span className="text-red-600">*</span>
             </Label>
             <Input
               id="expected_loan_amount"
               type="expected_loan_amount"
-              placeholder="Enter your Loan Ammount"
+              placeholder="Enter your Loan Amount"
               {...register("expected_loan_amount", {
                 required: "Loan Ammount is required",
                 pattern: {
@@ -168,7 +179,7 @@ const ApplicantDetails = ({
               )}
             </div>
 
-            <div className="form-section-content">
+            <div className="form-section-content w-[50%]">
               <Label>&nbsp;</Label>
               <Button
                 type="button"

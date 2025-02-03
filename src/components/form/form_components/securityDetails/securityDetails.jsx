@@ -164,11 +164,10 @@ export function SecurityDetails({
   return (
     <Card className="form-section shadow-lg">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Security Details</h1>
+        <h1 className="form-section-title">Security Details</h1>
         <Button
           type="button"
           onClick={() => setIsFormOpen(true)}
-          className="bg-blue-500 hover:bg-blue-600"
         >
           <PlusCircle className="mr-2 h-4 w-4" /> Add Security
         </Button>
@@ -404,6 +403,133 @@ export function SecurityDetails({
                     <SelectItem value="Argakhanchi">Argakhanchi</SelectItem>
                     <SelectItem value="Baglung">Baglung</SelectItem>
                     <SelectItem value="Baitadi">Baitadi</SelectItem>
+                    <SelectItem value="Bajhang">Bajhang</SelectItem>
+                    <SelectItem value="Bajura">Bajura</SelectItem>
+                    <SelectItem value="Balara">Balara</SelectItem>
+                    <SelectItem value="Barathawa">Barathawa</SelectItem>
+                    <SelectItem value="Bardibas">Bardibas</SelectItem>
+                    <SelectItem value="Belauri">Belauri</SelectItem>
+                    <SelectItem value="Belbari">Belbari</SelectItem>
+                    <SelectItem value="Bhadrapur">Bhadrapur</SelectItem>
+                    <SelectItem value="Bhaktapur">Bhaktapur</SelectItem>
+                    <SelectItem value="Bhojpur">Bhojpur</SelectItem>
+                    <SelectItem value="Biratnagar">Biratnagar</SelectItem>
+                    <SelectItem value="Burtibang">Burtibang</SelectItem>
+                    <SelectItem value="Butwal">Butwal</SelectItem>
+                    <SelectItem value="Chabahil">Chabahil</SelectItem>
+                    <SelectItem value="Chainpur">Chainpur</SelectItem>
+                    <SelectItem value="Chanauli">Chanauli</SelectItem>
+                    <SelectItem value="Chandranigahapur">Chandranigahapur</SelectItem>
+                    <SelectItem value="Chandrauta">Chandrauta</SelectItem>
+                    <SelectItem value="Chitwan">Chitwan</SelectItem>
+                    <SelectItem value="Dadeldhura">Dadeldhura</SelectItem>
+                    <SelectItem value="Dailekh">Dailekh</SelectItem>
+                    <SelectItem value="Damak">Damak</SelectItem>
+                    <SelectItem value="Darchula">Darchula</SelectItem>
+                    <SelectItem value="Dhading">Dhading</SelectItem>
+                    <SelectItem value="Dhalkebar">Dhalkebar</SelectItem>
+                    <SelectItem value="Dhangadi">Dhangadi</SelectItem>
+                    <SelectItem value="Dhankuta">Dhankuta</SelectItem>
+                    <SelectItem value="Dharan">Dharan</SelectItem>
+                    <SelectItem value="Diggala">Diggala</SelectItem>
+                    <SelectItem value="Dillibazzar">Dillibazzar</SelectItem>
+                    <SelectItem value="Dolakha">Dolakha</SelectItem>
+                    <SelectItem value="Dolpa">Dolpa</SelectItem>
+                    <SelectItem value="Doti">Doti</SelectItem>
+                    <SelectItem value="Dullu">Dullu</SelectItem>
+                    <SelectItem value="Gadsera">Gadsera</SelectItem>
+                    <SelectItem value="Garudha">Garudha</SelectItem>
+                    <SelectItem value="Gaur">Gaur</SelectItem>
+                    <SelectItem value="Ghartigaun">Ghartigaun</SelectItem>
+                    <SelectItem value="Ghorahi">Ghorahi</SelectItem>
+                    <SelectItem value="Gorkha">Gorkha</SelectItem>
+                    <SelectItem value="Gotikhel">Gotikhel</SelectItem>
+                    <SelectItem value="Gulariya">Gulariya</SelectItem>
+                    <SelectItem value="Gulmi">Gulmi</SelectItem>
+                    <SelectItem value="Hariwon">Hariwon</SelectItem>
+                    <SelectItem value="Humla">Humla</SelectItem>
+                    <SelectItem value="Illam">Illam</SelectItem>
+                    <SelectItem value="Inarwa">Inarwa</SelectItem>
+                    <SelectItem value="Jajarkot">Jajarkot</SelectItem>
+                    <SelectItem value="Jaleshwor">Jaleshwor</SelectItem>
+                    <SelectItem value="Janakpur">Janakpur</SelectItem>
+                    <SelectItem value="Jaspur">Jaspur</SelectItem>
+                    <SelectItem value="Jhotabhairab">Jhotabhairab</SelectItem>
+                    <SelectItem value="Jumla">Jumla</SelectItem>
+                    <SelectItem value="Kalaiya">Kalaiya</SelectItem>
+                    <SelectItem value="Kalanki">Kalanki</SelectItem>
+                    <SelectItem value="Kalikot">Kalikot</SelectItem>
+                    <SelectItem value="Kanchanpur">Kanchanpur</SelectItem>
+                    <SelectItem value="Kapilbastu">Kapilbastu</SelectItem>
+                    <SelectItem value="Kaski">Kaski</SelectItem>
+                    <SelectItem value="Katari">Katari</SelectItem>
+                    <SelectItem value="Kavrepalanchowk">Kavrepalanchowk</SelectItem>
+                    <SelectItem value="Kawaswoti">Kawaswoti</SelectItem>
+                    <SelectItem value="Khaireni">Khaireni</SelectItem>
+                    <SelectItem value="Khandbari">Khandbari</SelectItem>
+                    <SelectItem value="Khijifalate">Khijifalate</SelectItem>
+                    <SelectItem value="Khotang">Khotang</SelectItem>
+                    <SelectItem value="Khotang Bazar">Khotang Bazar</SelectItem>
+                    <SelectItem value="Lagankhel">Lagankhel</SelectItem>
+                    <SelectItem value="Lahan">Lahan</SelectItem>
+                    <SelectItem value="Lamahi">Lamahi</SelectItem>
+                    <SelectItem value="Lamjung">Lamjung</SelectItem>
+                    <SelectItem value="Lekhnath">Lekhnath</SelectItem>
+                    <SelectItem value="Madi">Madi</SelectItem>
+                    <SelectItem value="Majhagawa">Majhagawa</SelectItem>
+                    <SelectItem value="Majuwabazar">Majuwabazar</SelectItem>
+                    <SelectItem value="Makawanpur">Makawanpur</SelectItem>
+                    <SelectItem value="Malangawa">Malangawa</SelectItem>
+                    <SelectItem value="Manamaiju">Manamaiju</SelectItem>
+                    <SelectItem value="Manang">Manang</SelectItem>
+                    <SelectItem value="Mangalbare">Mangalbare</SelectItem>
+                    <SelectItem value="Maulapur">Maulapur</SelectItem>
+                    <SelectItem value="Mehelakuna">Mehelakuna</SelectItem>
+                    <SelectItem value="Mugu">Mugu</SelectItem>
+                    <SelectItem value="Mustang">Mustang</SelectItem>
+                    <SelectItem value="Myagdi">Myagdi</SelectItem>
+                    <SelectItem value="Narainpur">Narainpur</SelectItem>
+                    <SelectItem value="Nepalgunj">Nepalgunj</SelectItem>
+                    <SelectItem value="Nuwakot">Nuwakot</SelectItem>
+                    <SelectItem value="Okhaldhunga">Okhaldhunga</SelectItem>
+                    <SelectItem value="Palpa">Palpa</SelectItem>
+                    <SelectItem value="Panchthar">Panchthar</SelectItem>
+                    <SelectItem value="Parasi">Parasi</SelectItem>
+                    <SelectItem value="Parbat">Parbat</SelectItem>
+                    <SelectItem value="Parsa">Parsa</SelectItem>
+                    <SelectItem value="Pyuthan">Pyuthan</SelectItem>
+                    <SelectItem value="Rajapur">Rajapur</SelectItem>
+                    <SelectItem value="Rajbiraj">Rajbiraj</SelectItem>
+                    <SelectItem value="Ramechhap">Ramechhap</SelectItem>
+                    <SelectItem value="Rampur">Rampur</SelectItem>
+                    <SelectItem value="Rangeli">Rangeli</SelectItem>
+                    <SelectItem value="Rasuwa">Rasuwa</SelectItem>
+                    <SelectItem value="Rolpa">Rolpa</SelectItem>
+                    <SelectItem value="Rukum">Rukum</SelectItem>
+                    <SelectItem value="Rukumkot">Rukumkot</SelectItem>
+                    <SelectItem value="Rupandehi">Rupandehi</SelectItem>
+                    <SelectItem value="Salyan">Salyan</SelectItem>
+                    <SelectItem value="Sankhu">Sankhu</SelectItem>
+                    <SelectItem value="Sankranti Bazzar">Sankranti Bazzar</SelectItem>
+                    <SelectItem value="Shikharkot">Shikharkot</SelectItem>
+                    <SelectItem value="Siddhibas">Siddhibas</SelectItem>
+                    <SelectItem value="Simara">Simara</SelectItem>
+                    <SelectItem value="Simaraungadh">Simaraungadh</SelectItem>
+                    <SelectItem value="Sindhuli">Sindhuli</SelectItem>
+                    <SelectItem value="Sindhupalchowk">Sindhupalchowk</SelectItem>
+                    <SelectItem value="Siraha">Siraha</SelectItem>
+                    <SelectItem value="Solukhumbu">Solukhumbu</SelectItem>
+                    <SelectItem value="Sunsari">Sunsari</SelectItem>
+                    <SelectItem value="Surkhet">Surkhet</SelectItem>
+                    <SelectItem value="Syanja">Syanja</SelectItem>
+                    <SelectItem value="Tanahu">Tanahu</SelectItem>
+                    <SelectItem value="Taplejung">Taplejung</SelectItem>
+                    <SelectItem value="Terathum">Terathum</SelectItem>
+                    <SelectItem value="Tikapur">Tikapur</SelectItem>
+                    <SelectItem value="Tokha">Tokha</SelectItem>
+                    <SelectItem value="Tulsipur">Tulsipur</SelectItem>
+                    <SelectItem value="Udayapur">Udayapur</SelectItem>
+                    <SelectItem value="Waling">Waling</SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.land_revenue_office && (
@@ -447,10 +573,10 @@ export function SecurityDetails({
               <div className="form-section-content">
                 <Label htmlFor="road_access">Motorable Road Access</Label>
                 <Select
-                  id="shape_of_land"
+                  id="motoorable_road_access"
                   onValueChange={(value) =>
                     handleChange({
-                      target: { id: "shape_of_land", value },
+                      target: { id: "motoorable_road_access", value },
                     })
                   }
                 >

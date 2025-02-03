@@ -109,11 +109,10 @@ export function FacilityDetails({
   return (
     <Card className="form-section shadow-lg">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Facility Details</h1>
+        <h1 className="form-section-title">Facility Details</h1>
         <Button
           type="button"
           onClick={() => setIsFormOpen(true)}
-          className="bg-blue-500 hover:bg-blue-600"
         >
           <PlusCircle className="mr-2 h-4 w-4" /> Add Facility
         </Button>
@@ -134,6 +133,7 @@ export function FacilityDetails({
               <TableCell>{facility.facility_type}</TableCell>
               <TableCell>{facility.tenure}</TableCell>
               <TableCell>{facility.proposal_limit}</TableCell>
+              <TableCell>{facility.purpose}</TableCell>
               <TableCell>
                 <Button
                   variant="ghost"
@@ -150,9 +150,6 @@ export function FacilityDetails({
 
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="max-w-[80%] max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Add Facility</DialogTitle>
-          </DialogHeader>
           <form onSubmit={addFacility} className="space-y-4">
             <h1 className="form-section-title">Facility Details</h1>
 

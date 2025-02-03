@@ -34,6 +34,7 @@ import { Label } from "@radix-ui/react-dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@radix-ui/react-toast";
 import { Toaster } from "../ui/toaster";
+import Preview from "./form_components/preview/Preview";
 
 const Form = () => {
   // Initialize useForm
@@ -121,11 +122,11 @@ const Form = () => {
   // Form submission handler
   const onSubmit = () => {
     // e.preventDefault();
-    alert("Form Submitted");
     console.log("Form Submitted:", retailLoanData);
-    adddPersonalInfo(retailLoanData);
-
+    // adddPersonalInfo(retailLoanData);
+    
     navigate("/");
+    alert("Form Submitted");
   };
 
   // Stepper object to track section completion
@@ -152,7 +153,7 @@ const Form = () => {
     },
 
     {
-      state: true,
+      state: false,
       value: "Preview",
       icon: Eye, // Use an eye icon for preview
     },
@@ -233,6 +234,11 @@ const Form = () => {
               handleSelectChange={handleSelectChange}
               stepper={stepper}
               handleStepper={handleStepper}
+            />
+          )}
+          {stepper[3].state && (
+            <Preview
+              data={retailLoanData}
             />
           )}
           {stepper[3].state && (

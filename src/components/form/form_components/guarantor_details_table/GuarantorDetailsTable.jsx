@@ -207,7 +207,6 @@ export function GuarantorDetailsTable({
         <Button
           type="button"
           onClick={() => setIsFormOpen(true)}
-          className="bg-blue-500 hover:bg-blue-600"
         >
           <PlusCircle className="mr-2 h-4 w-4" /> Add Guarantor
         </Button>
@@ -264,7 +263,8 @@ export function GuarantorDetailsTable({
                 <h1 className="form-section-title">Guarantor Details</h1>
                 <div className="form-section-content">
                   <Label htmlFor="is_existing_customer">
-                    Are you an Existing CAS Bank Customer?
+                    Are you an Existing CAS Bank Customer?  {" "}
+                    <span className="text-red-600">*</span>
                   </Label>
                   <Select
                     id="is_existing_customer"
@@ -295,7 +295,9 @@ export function GuarantorDetailsTable({
                   {/* Account Number */}
                   <div className="form-section-content-container">
                     <div className="form-section-content">
-                      <Label htmlFor="account_number">Account Number</Label>
+                      <Label htmlFor="account_number">Account Number {" "}
+                      <span className="text-red-600">*</span>
+                      </Label>
                       <Input
                         id="account_number"
                         value={guarantorDetails.account_number}
@@ -311,7 +313,9 @@ export function GuarantorDetailsTable({
 
                     {/* Phone Number */}
                     <div className="form-section-content">
-                      <Label htmlFor="phone">Phone Number</Label>
+                      <Label htmlFor="phone">Phone Number {" "}
+                      <span className="text-red-600">*</span>
+                      </Label>
                       <Input
                         id="phone"
                         type="tel"
@@ -353,7 +357,9 @@ export function GuarantorDetailsTable({
 
                     {/* Email */}
                     <div className="form-section-content">
-                      <Label htmlFor="email">Email Address</Label>
+                      <Label htmlFor="email">Email Address{" "}
+                      <span className="text-red-600">*</span>
+                      </Label>
                       <Input
                         id="email"
                         type="email"

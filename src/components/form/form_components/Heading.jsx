@@ -46,6 +46,7 @@ const Heading = () => {
                   <li>You have a valid email address</li>
                   <li>You agree to our terms of service</li>
                   <li>You have a stable internet connection</li>
+                  <li>You also need to have an Account in Cas Bank</li>
                 </ul>
               </AlertDialogDescription>
             </AlertDialogHeader>
