@@ -69,7 +69,8 @@ export const useAppStore = create((set) => ({
 
   fetchPersonalInfos: async () => {
     const home = "ashaya.com:8000";
-    const fetchRetailTableData = `http://${home}/api/method/onlinelc.api.fetch_personal_info`;
+    // const fetchRetailTableData = `http://${home}/api/method/onlinelc.api.fetch_personal_info`;
+    const fetchRetailTableData = `http://${home}/api/resource/Retail Loan`;
     const authorizationToken = "fe850d916626397:77854dc086219ac";
 
     set({ loading: true, error: null }); // Set loading state

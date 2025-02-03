@@ -219,7 +219,7 @@ export function GuarantorDetailsTable({
           {filteredPeople.map((person) => (
             <TableRow key={person.id}>
               <TableCell className="font-medium">
-                {person.custom_customer_name}
+                {person.guarantor_name}
               </TableCell>
               <TableCell>{person.email}</TableCell>
               <TableCell>{person.phone}</TableCell>
@@ -319,18 +319,18 @@ export function GuarantorDetailsTable({
                   <h1 className="form-section-title">Personal Information</h1>
                   <div className="form-section-content-container">
                     <div className="form-section-content">
-                      <Label htmlFor="custom_customer_name">
+                      <Label htmlFor="guarantor_name">
                         Guarantor Full Name
                       </Label>
                       <Input
-                        id="custom_customer_name"
-                        value={guarantorDetails.custom_customer_name}
+                        id="guarantor_name"
+                        value={guarantorDetails.guarantor_name}
                         onChange={handleChange}
                         placeholder="Enter your full name"
                       />
-                      {errors.custom_customer_name && (
+                      {errors.guarantor_name && (
                         <p className="text-red-600 text-sm">
-                          {errors.custom_customer_name}
+                          {errors.guarantor_name}
                         </p>
                       )}
                     </div>

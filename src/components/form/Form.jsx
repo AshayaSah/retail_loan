@@ -76,29 +76,30 @@ const Form = () => {
   const handleFetch = () => {
     if (
       retailLoanData.account_number == "13420002008" &&
-      retailLoanData.phone == "9810126827"
+      retailLoanData.custom_contact_no == "9810126827"
     ) {
       setError(false);
       setLoading(true);
       setTimeout(() => {
         const fetchData = {
           custom_customer_name: "Sakshyam Shrestha",
-          email: "sakshyamshrestha111@gmail.com",
+          custom_email: "sakshyamshrestha111@gmail.com",
           date_of_birth: "1999-01-01",
           gender: "Male",
-          marital_status: "Unmarried",
+          marital_status: "Single",
           nationality: "Nepali",
+          customer_client_code: "R01281735",
 
           citizenship_issued_date: "2020-08-26",
           citizenship_issued_district: "Kathmandu",
           citizenship_number: "324324",
           pan_number: "10241234",
-          pan_issued_date: "2020-08-26",
-          pan_issued_district: "Kathmandu",
+          pan_registration_date: "2020-08-26",
+          pan_registration_district: "Kathmandu",
 
           fathers_name: "Suraj Raj Shrestha",
           grandfathers_name: "Ambar Bahadur Raj Shrestha",
-          mother_name: "Karuna Shrestha",
+          mothers_name: "Karuna Shrestha",
           offsprings: "2",
           spouse_name: "None",
 
@@ -118,10 +119,10 @@ const Form = () => {
   };
 
   // Form submission handler
-  const onSubmit = (e) => {
-    e.preventDefault();
+  const onSubmit = () => {
+    // e.preventDefault();
     console.log("Form Submitted:", retailLoanData);
-    // adddPersonalInfo(retailLoanData);
+    adddPersonalInfo(retailLoanData);
 
     // navigate("/");
   };
@@ -150,7 +151,7 @@ const Form = () => {
     },
 
     {
-      state: false,
+      state: true,
       value: "Preview",
       icon: Eye, // Use an eye icon for preview
     },
@@ -238,7 +239,7 @@ const Form = () => {
               <Button variant="outline" type="button" className="">
                 Cancel
               </Button>
-              <Button type="button" className="">
+              <Button type="submit" className="">
                 Submit Application
               </Button>
             </div>

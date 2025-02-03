@@ -67,17 +67,17 @@ const ApplicantDetails = ({
 
         {/* Is Existing Customer  */}
         <div className="form-section-content">
-          <Label htmlFor="is_existing_customer">
+          <Label htmlFor="custom_client_type">
             Are you an Existing CAS Bank Customer?{" "}
             <span className="text-red-600">*</span>
           </Label>
           <Controller
-            name="is_existing_customer"
+            name="custom_client_type"
             control={control}
             rules={{ required: "This field is required" }}
             render={({ field }) => (
               <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger id="is_existing_customer">
+                <SelectTrigger id="custom_client_type">
                   <SelectValue placeholder="Select an option" />
                 </SelectTrigger>
                 <SelectContent>
@@ -87,17 +87,41 @@ const ApplicantDetails = ({
               </Select>
             )}
           />
-          {errors.is_existing_customer && (
+          {errors.custom_client_type && (
             <p className="text-red-600 text-sm">
-              {errors.is_existing_customer.message}
+              {errors.custom_client_type.message}
             </p>
           )}
         </div>
       </div>
 
       {/* Applicant Details Section */}
-      {retailLoanData.is_existing_customer === "Existing" && (
+      {retailLoanData.custom_client_type === "Existing" && (
         <>
+          {/* Email Address Field */}
+          <div className="form-section-content ">
+            <Label htmlFor="expected_loan_amount">
+              Expected Loan Ammount <span className="text-red-600">*</span>
+            </Label>
+            <Input
+              id="expected_loan_amount"
+              type="expected_loan_amount"
+              placeholder="Enter your Loan Ammount"
+              {...register("expected_loan_amount", {
+                required: "Loan Ammount is required",
+                pattern: {
+                  value: /^[0-9]+$/,
+                  message: "Enter a valid Loan Ammount",
+                },
+              })}
+            />
+            {errors.expected_loan_amount && (
+              <p className="text-red-600 text-sm">
+                {errors.expected_loan_amount.message}
+              </p>
+            )}
+          </div>
+
           {/* Account Number  */}
           <div className="form-section-content-container-single pb-0">
             {/* Account Number  */}
@@ -106,9 +130,9 @@ const ApplicantDetails = ({
                 Account Number <span className="text-red-600">*</span>
               </Label>
               <Input
+                placeholder="Enter your Account Number (1342xxxxxxxxx)"
                 id="account_number"
                 {...register("account_number", {
-                  placeholder: "Enter your Accont Number (1342xxxxxxxxx)",
                   required: "Please, enter your account number",
                 })}
               />
@@ -124,12 +148,12 @@ const ApplicantDetails = ({
           <div className="form-section-content-container">
             {/* Phone Number Field */}
             <div className="form-section-content flex-1">
-              <Label htmlFor="phone">Phone Number</Label>
+              <Label htmlFor="custom_contact_no">Contact Number</Label>
               <Input
-                id="phone"
+                id="custom_contact_no"
                 type="tel"
                 placeholder="Enter your 10-digit phone number"
-                {...register("phone", {
+                {...register("custom_contact_no", {
                   // required: "Phone number is required",
                   // pattern: {
                   //   value: /^[0-9]{10}$/,
@@ -137,8 +161,10 @@ const ApplicantDetails = ({
                   // },
                 })}
               />
-              {errors.phone && (
-                <p className="text-red-600 text-sm">{errors.phone.message}</p>
+              {errors.custom_contact_no && (
+                <p className="text-red-600 text-sm">
+                  {errors.custom_contact_no.message}
+                </p>
               )}
             </div>
 
@@ -206,14 +232,39 @@ const ApplicantDetails = ({
 
                 {/* Email Address Field */}
                 <div className="form-section-content ">
-                  <Label htmlFor="email">
+                  <Label htmlFor="customer_client_code">
+                    Client Code <span className="text-red-600">*</span>
+                  </Label>
+                  <Input
+                    id="customer_client_code"
+                    type="customer_client_code"
+                    placeholder="Enter your Client Code"
+                    {...register("customer_client_code", {
+                      required: "Client Code is required",
+                      // pattern: {
+                      //   value:
+                      //     /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                      //   message: "Enter a valid email address",
+                      // },
+                    })}
+                  />
+                  {errors.customer_client_code && (
+                    <p className="text-red-600 text-sm">
+                      {errors.customer_client_code.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Email Address Field */}
+                <div className="form-section-content ">
+                  <Label htmlFor="custom_email">
                     Email Address <span className="text-red-600">*</span>
                   </Label>
                   <Input
-                    id="email"
-                    type="email"
+                    id="custom_email"
+                    type="custom_email"
                     placeholder="Enter your email"
-                    {...register("email", {
+                    {...register("custom_email", {
                       required: "Email is required",
                       pattern: {
                         value:
@@ -222,9 +273,9 @@ const ApplicantDetails = ({
                       },
                     })}
                   />
-                  {errors.email && (
+                  {errors.custom_email && (
                     <p className="text-red-600 text-sm">
-                      {errors.email.message}
+                      {errors.custom_email.message}
                     </p>
                   )}
                 </div>
@@ -297,7 +348,7 @@ const ApplicantDetails = ({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="Married">Married</SelectItem>
-                          <SelectItem value="Unmarried">Unmarried</SelectItem>
+                          <SelectItem value="Single">Single</SelectItem>
                         </SelectContent>
                       </Select>
                     )}
@@ -442,32 +493,32 @@ const ApplicantDetails = ({
                 </div>
 
                 <div className="form-section-content">
-                  <Label htmlFor="pan_issued_date">Pan Issued Date</Label>
+                  <Label htmlFor="pan_registration_date">Pan Issued Date</Label>
                   <Input
-                    id="pan_issued_date"
+                    id="pan_registration_date"
                     type="date"
                     placeholder="DD/MM/YYYY"
-                    {...register("pan_issued_date", {
+                    {...register("pan_registration_date", {
                       required: "Please, enter your pan issued date",
                       pattern: {
                         message: "Invalid format. Use DD/MM/YYYY",
                       },
                     })}
                   />
-                  {errors.pan_issued_date && (
+                  {errors.pan_registration_date && (
                     <p className="text-red-600 text-sm">
-                      {errors.pan_issued_date.message}
+                      {errors.pan_registration_date.message}
                     </p>
                   )}
                 </div>
 
                 <div className="form-section-content">
-                  <Label htmlFor="pan_issued_district">
+                  <Label htmlFor="pan_registration_district">
                     Pan Issued District
                   </Label>
                   <Select
                     onValueChange={(value) =>
-                      handleSelectChange("pan_issued_district", value)
+                      handleSelectChange("pan_registration_district", value)
                     }
                   >
                     <SelectTrigger>
@@ -487,9 +538,9 @@ const ApplicantDetails = ({
                       <SelectItem value="Bardiya">Bardiya</SelectItem>
                     </SelectContent>
                   </Select>
-                  {errors.pan_issued_district && (
+                  {errors.pan_registration_district && (
                     <p className="text-red-600 text-sm">
-                      {errors.pan_issued_district.message}
+                      {errors.pan_registration_district.message}
                     </p>
                   )}
                 </div>
@@ -543,11 +594,11 @@ const ApplicantDetails = ({
                 </div>
 
                 <div className="form-section-content">
-                  <Label htmlFor="mother_name">Mother's Name (Optional)</Label>
+                  <Label htmlFor="mothers_name">Mother's Name (Optional)</Label>
                   <Input
-                    id="mother_name"
+                    id="mothers_name"
                     placeholder="Enter mother's name"
-                    {...register("mother_name", {
+                    {...register("mothers_name", {
                       // required: "Mother's name is required",
                       // pattern: {
                       //   value: /^[A-Za-z\s]+$/,
@@ -556,9 +607,9 @@ const ApplicantDetails = ({
                       // },
                     })}
                   />
-                  {errors.mother_name && (
+                  {errors.mothers_name && (
                     <p className="text-red-600 text-sm">
-                      {errors.mother_name.message}
+                      {errors.mothers_name.message}
                     </p>
                   )}
                 </div>

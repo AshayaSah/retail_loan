@@ -46,11 +46,11 @@ export function FacilityDetails({
     const newFacility = { ...facilityDetails, id: Date.now() };
     setFacilities([...facilities, newFacility]);
 
-    if (!retailLoanData.facility) {
-      setValue("facility", [newFacility]);
+    if (!retailLoanData.table_lfoa) {
+      setValue("table_lfoa", [newFacility]);
     } else {
-      const updatedFacilities = [...retailLoanData.facility, newFacility];
-      setValue("facility", updatedFacilities);
+      const updatedFacilities = [...retailLoanData.table_lfoa, newFacility];
+      setValue("table_lfoa", updatedFacilities);
     }
 
     setFacilityDetails({
