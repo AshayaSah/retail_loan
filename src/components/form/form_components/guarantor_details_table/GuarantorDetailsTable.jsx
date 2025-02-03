@@ -47,14 +47,40 @@ export function GuarantorDetailsTable({
     citizenship_issued_date: "",
     citizenship_issued_district: "",
     pan_number: "",
-    education: "",
-    experience: "",
+    pan_issued_date: "",
+    pan_issued_district: "",
     grandfathers_name: "",
     fathers_name: "",
     mother_name: "",
     spouse_name: "",
     offsprings: "",
   });
+
+  const handleFetch = () => {
+    if (
+      guarantorDetails.account_number == "13420002008" &&
+      guarantorDetails.phone == "9810126827"
+    ) {
+      setTimeout(() => {
+        setGuarantorDetails({
+          ...guarantorDetails,
+          custom_customer_name: "John Doe",
+          email: "johndoe@example.com",
+          citizenship_number: "1234567890",
+          citizenship_issued_date: "2015-06-12",
+          citizenship_issued_district: "Kathmandu",
+          pan_number: "987654321",
+          pan_issued_date: "2015-06-12",
+          pan_issued_district: "Kathmandu",
+          grandfathers_name: "Ram Bahadur Doe",
+          fathers_name: "Shyam Bahadur Doe",
+          mother_name: "Sita Doe",
+          spouse_name: "Rita Doe",
+          offsprings: "2",
+        });
+      }, 1000);
+    }
+  };
 
   const addPerson = (e) => {
     e.preventDefault();
@@ -75,8 +101,6 @@ export function GuarantorDetailsTable({
           citizenship_issued_date: "",
           citizenship_issued_district: "",
           pan_number: "",
-          education: "",
-          experience: "",
           grandfathers_name: "",
           fathers_name: "",
           mother_name: "",
@@ -163,8 +187,9 @@ export function GuarantorDetailsTable({
   return (
     <Card className="form-section shadow-lg">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Guarantor Details</h1>
+        <h1 className="form-section-title">Guarantor Details</h1>
         <Button
+          type="button"
           onClick={() => setIsFormOpen(true)}
           className="bg-blue-500 hover:bg-blue-600"
         >
@@ -252,7 +277,7 @@ export function GuarantorDetailsTable({
               {guarantorDetails.is_existing_customer === "YES" && (
                 <>
                   {/* Account Number */}
-                  <div className="form-section-content-container-single">
+                  <div className="form-section-content-container">
                     <div className="form-section-content">
                       <Label htmlFor="account_number">Account Number</Label>
                       <Input
@@ -266,6 +291,27 @@ export function GuarantorDetailsTable({
                           {errors.account_number}
                         </p>
                       )}
+                    </div>
+
+                    {/* Phone Number */}
+                    <div className="form-section-content">
+                      <Label htmlFor="phone">Phone Number</Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        value={guarantorDetails.phone}
+                        onChange={handleChange}
+                        placeholder="Enter your phone number"
+                      />
+                      {errors.phone && (
+                        <p className="text-red-600 text-sm">{errors.phone}</p>
+                      )}
+                    </div>
+
+                    <div className="form-section-content">
+                      <Button type="button" onClick={() => handleFetch()}>
+                        Fetch Data
+                      </Button>
                     </div>
                   </div>
 
@@ -301,21 +347,6 @@ export function GuarantorDetailsTable({
                       />
                       {errors.email && (
                         <p className="text-red-600 text-sm">{errors.email}</p>
-                      )}
-                    </div>
-
-                    {/* Phone Number */}
-                    <div className="form-section-content">
-                      <Label htmlFor="phone">Phone Number</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        value={guarantorDetails.phone}
-                        onChange={handleChange}
-                        placeholder="Enter your phone number"
-                      />
-                      {errors.phone && (
-                        <p className="text-red-600 text-sm">{errors.phone}</p>
                       )}
                     </div>
                   </div>
@@ -362,6 +393,24 @@ export function GuarantorDetailsTable({
                     </div>
 
                     <div className="form-section-content">
+                      <Label htmlFor="citizenship_issued_district">
+                        Citizenship Issued District
+                      </Label>
+                      <Input
+                        id="citizenship_issued_district"
+                        type="text"
+                        value={guarantorDetails.citizenship_issued_district}
+                        onChange={handleChange}
+                        placeholder="DD/MM/YYYY"
+                      />
+                      {errors.citizenship_issued_district && (
+                        <p className="text-red-600 text-sm">
+                          {errors.citizenship_issued_district}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="form-section-content">
                       <Label htmlFor="pan_number">PAN Number</Label>
                       <Input
                         id="pan_number"
@@ -373,6 +422,42 @@ export function GuarantorDetailsTable({
                       {errors.pan_number && (
                         <p className="text-red-600 text-sm">
                           {errors.pan_number}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="form-section-content">
+                      <Label htmlFor="pan_issued_date">
+                        PAN Issued Date (DD/MM/YYYY)
+                      </Label>
+                      <Input
+                        id="pan_issued_date"
+                        type="text"
+                        value={guarantorDetails.pan_issued_date}
+                        onChange={handleChange}
+                        placeholder="DD/MM/YYYY"
+                      />
+                      {errors.pan_issued_date && (
+                        <p className="text-red-600 text-sm">
+                          {errors.pan_issued_date}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="form-section-content">
+                      <Label htmlFor="pan_issued_district">
+                        PAN Issued District
+                      </Label>
+                      <Input
+                        id="pan_issued_district"
+                        type="text"
+                        value={guarantorDetails.pan_issued_district}
+                        onChange={handleChange}
+                        placeholder="DD/MM/YYYY"
+                      />
+                      {errors.pan_issued_district && (
+                        <p className="text-red-600 text-sm">
+                          {errors.pan_issued_district}
                         </p>
                       )}
                     </div>
@@ -476,15 +561,15 @@ export function GuarantorDetailsTable({
           </form>
         </DialogContent>
       </Dialog>
-   <div className="">
-      {!stepper[1].state && (
-        <div className="form-next-button">
-          <Button type="submit" onClick={() => handleStepper(1)}>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          </Button>
-        </div>
-      )}
-   </div>
+      <div className="">
+        {!stepper[1].state && (
+          <div className="form-next-button">
+            <Button type="submit" onClick={() => handleStepper(1)}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </Button>
+          </div>
+        )}
+      </div>
     </Card>
   );
 }

@@ -82,19 +82,30 @@ const Form = () => {
       setLoading(true);
       setTimeout(() => {
         const fetchData = {
+          custom_customer_name: "Sakshyam Shrestha",
+          email: "sakshyamshrestha111@gmail.com",
+          date_of_birth: "1999-01-01",
+          gender: "Male",
+          marital_status: "Unmarried",
+          nationality: "Nepali",
+
           citizenship_issued_date: "2020-08-26",
           citizenship_issued_district: "Kathmandu",
           citizenship_number: "324324",
-          custom_customer_name: "Sakshyam Shrestha",
-          education: "bachelors",
-          email: "sakshyamshrestha111@gmail.com",
-          experience: "0-1",
+          pan_number: "10241234",
+          pan_issued_date: "2020-08-26",
+          pan_issued_district: "Kathmandu",
+
           fathers_name: "Suraj Raj Shrestha",
           grandfathers_name: "Ambar Bahadur Raj Shrestha",
           mother_name: "Karuna Shrestha",
           offsprings: "2",
-          pan_number: "10241234",
           spouse_name: "None",
+
+          province: "Bagmati Province",
+          district: "Lalitpur",
+          vdc_municipality: "Mahalaxmi",
+          ward_no: "10",
         };
 
         Object.keys(fetchData).forEach((key) => setValue(key, fetchData[key]));
