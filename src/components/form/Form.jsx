@@ -58,7 +58,7 @@ const Form = () => {
   } = useAppStore();
 
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const [toast, setToast] = useState(null);
 
   // Watch all form values at once
   const retailLoanData = useWatch({ control });

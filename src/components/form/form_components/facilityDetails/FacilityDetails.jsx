@@ -190,7 +190,7 @@ export function FacilityDetails({
                 />
               </div>
 
-              <div className="form-section-content">
+              {/* <div className="form-section-content">
                 <Label htmlFor="base_rate">Base Rate (%)</Label>
                 <Input
                   id="base_rate"
@@ -221,7 +221,8 @@ export function FacilityDetails({
                   placeholder="Enter interest proposed"
                   className="w-full h-10 p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-              </div>
+              </div> */}
+
               <div className="form-section-content">
                 <Label htmlFor="purpose">Purpose</Label>
                 <Textarea
@@ -233,7 +234,7 @@ export function FacilityDetails({
                 />
               </div>
 
-              <div className="form-section-content">
+              {/* <div className="form-section-content">
                 <Label htmlFor="service_fees">Service Fees</Label>
                 <Input
                   id="service_fees"
@@ -242,16 +243,16 @@ export function FacilityDetails({
                   placeholder="Enter service fees"
                   className="w-full h-10 p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-              </div>
+              </div> */}
 
-              <div className="form-section-content">
+              {/* <div className="form-section-content">
                 <Label>&nbsp;</Label>
                 <Button type="button" onClick={() => handleEmi()}>
                   Calculate EMI
                 </Button>
-              </div>
+              </div> */}
             </div>
-            <div className="form-section-content">
+            {/* <div className="form-section-content">
               <h1 className="form-section-title">Calculated EMI</h1>
               <Label htmlFor="emi">EMI</Label>
               <Input
@@ -261,7 +262,7 @@ export function FacilityDetails({
                 placeholder="Enter EMI"
                 className="w-full h-10 p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-            </div>
+            </div> */}
 
             <DialogFooter>
               <Button
