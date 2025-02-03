@@ -1,6 +1,8 @@
-import React from "react";
-import { Calendar, Check, Home, Inbox, Search, Settings } from "lucide-react";
-import Logo from "@/assets/logo.png";
+import React, { useEffect } from "react";
+import AOS from "aos"; 
+import "aos/dist/aos.css"; 
+import { Calendar, Check, CircleCheck, Circle, Home, Inbox, Search, Settings } from "lucide-react";
+
 import {
   Sidebar,
   SidebarContent,
@@ -15,35 +17,45 @@ import {
 import { ModeToggle } from "./ModeToggle";
 
 const AppSidebar = ({ stepper }) => {
+  useEffect(() => {
+    AOS.init(); 
+  }, []);
+
   return (
-    <Sidebar varient="floating" collapsible="icon">
+    <Sidebar variant="floating" collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
           <SidebarTrigger />
-          <img src={Logo} alt="" />
-          {/* <ModeToggle></ModeToggle> */}
+          <ModeToggle />
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-">
-            Home Loan Form
-          </SidebarGroupLabel>
+          <SidebarGroupLabel className="text-gray-500 text-xl mb-4">Application</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu >
               {stepper.map((item) => (
-                <SidebarMenuItem key={item.value}>
+                <SidebarMenuItem 
+                  key={item.value} 
+                  data-aos="fade-up" // Add AOS animation
+                >
                   <SidebarMenuButton asChild>
                     <div
-                      className={`${
+                      className={`flex items-center justify-between ${
                         item.state
                           ? "text-primary text-xl"
                           : "text-muted-foreground"
                       }`}
                     >
-                      <item.icon />
-                      <span>{item.value}</span>
-                      {item.state && <Check></Check>}
+                      <div className="flex items-center">
+                        <item.icon className="mr-2 text-primary" />
+                        <span>{item.value}</span>
+                      </div>
+                      {item.state ? (
+                        <CircleCheck className="text-primary w-6 h-6" />
+                      ) : (
+                        <Circle className="text-gray-400 w-6 h-6" />
+                      )}
                     </div>
-                  </SidebarMenuButton>
+                  </SidebarMenuButton >
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>

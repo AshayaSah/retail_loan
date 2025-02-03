@@ -11,7 +11,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import BGImage from "../../../assets/bgImage.png";
+import BGImage from "../../../assets/Blue Professional Home Loan YouTube Thumbnail.png";
 
 const Heading = () => {
   const [isOpen, setIsOpen] = useState(false);
