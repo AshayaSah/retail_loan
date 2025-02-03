@@ -40,15 +40,19 @@ export function GuarantorDetailsTable({
   const [guarantorDetails, setGuarantorDetails] = useState({
     is_existing_customer: "",
     account_number: "",
-    custom_customer_name: "",
+    guarantor_name: "",
     email: "",
     phone: "",
     citizenship_number: "",
     citizenship_issued_date: "",
     citizenship_issued_district: "",
     pan_number: "",
-    pan_issued_date: "",
-    pan_issued_district: "",
+    pan_registration_date: "",
+    pan_registration_district: "",
+    province: "",
+    district: "",
+    vdc__municipality: "",
+    ward_no: "",
     grandfathers_name: "",
     fathers_name: "",
     mother_name: "",
@@ -64,14 +68,18 @@ export function GuarantorDetailsTable({
       setTimeout(() => {
         setGuarantorDetails({
           ...guarantorDetails,
-          custom_customer_name: "John Doe",
+          guarantor_name: "John Doe",
           email: "johndoe@example.com",
           citizenship_number: "1234567890",
           citizenship_issued_date: "2015-06-12",
           citizenship_issued_district: "Kathmandu",
           pan_number: "987654321",
-          pan_issued_date: "2015-06-12",
-          pan_issued_district: "Kathmandu",
+          pan_registration_date: "2015-06-12",
+          pan_registration_district: "Kathmandu",
+          province: "Bagmati Province",
+          district: "Kathmandu",
+          vdc__municipality: "Kathmandu",
+          ward_no: "10",
           grandfathers_name: "Ram Bahadur Doe",
           fathers_name: "Shyam Bahadur Doe",
           mother_name: "Sita Doe",
@@ -94,13 +102,19 @@ export function GuarantorDetailsTable({
         setGuarantorDetails({
           is_existing_customer: "",
           account_number: "",
-          custom_customer_name: "",
+          guarantor_name: "",
           email: "",
           phone: "",
           citizenship_number: "",
           citizenship_issued_date: "",
           citizenship_issued_district: "",
           pan_number: "",
+          pan_registration_date: "",
+          pan_registration_district: "",
+          province: "",
+          district: "",
+          vdc__municipality: "",
+          ward_no: "",
           grandfathers_name: "",
           fathers_name: "",
           mother_name: "",
@@ -118,15 +132,19 @@ export function GuarantorDetailsTable({
       setGuarantorDetails({
         is_existing_customer: "",
         account_number: "",
-        custom_customer_name: "",
+        guarantor_name: "",
         email: "",
         phone: "",
         citizenship_number: "",
         citizenship_issued_date: "",
         citizenship_issued_district: "",
         pan_number: "",
-        education: "",
-        experience: "",
+        pan_registration_date: "",
+        pan_registration_district: "",
+        province: "",
+        district: "",
+        vdc__municipality: "",
+        ward_no: "",
         grandfathers_name: "",
         fathers_name: "",
         mother_name: "",
@@ -152,7 +170,7 @@ export function GuarantorDetailsTable({
         newErrors.account_number = "Please, enter your account number.";
       }
     }
-    if (!guarantorDetails.custom_customer_name) {
+    if (!guarantorDetails.guarantor_name) {
       newErrors.custom_customer_name = "Full name is required.";
     }
     if (!guarantorDetails.email) {
@@ -178,9 +196,7 @@ export function GuarantorDetailsTable({
 
   const filteredPeople = guarantors.filter(
     (person) =>
-      person.custom_customer_name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
+      person.guarantor_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       person.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -427,37 +443,37 @@ export function GuarantorDetailsTable({
                     </div>
 
                     <div className="form-section-content">
-                      <Label htmlFor="pan_issued_date">
+                      <Label htmlFor="pan_registration_date">
                         PAN Issued Date (DD/MM/YYYY)
                       </Label>
                       <Input
-                        id="pan_issued_date"
+                        id="pan_registration_date"
                         type="text"
-                        value={guarantorDetails.pan_issued_date}
+                        value={guarantorDetails.pan_registration_date}
                         onChange={handleChange}
                         placeholder="DD/MM/YYYY"
                       />
-                      {errors.pan_issued_date && (
+                      {errors.pan_registration_date && (
                         <p className="text-red-600 text-sm">
-                          {errors.pan_issued_date}
+                          {errors.pan_registration_date}
                         </p>
                       )}
                     </div>
 
                     <div className="form-section-content">
-                      <Label htmlFor="pan_issued_district">
+                      <Label htmlFor="pan_registration_district">
                         PAN Issued District
                       </Label>
                       <Input
-                        id="pan_issued_district"
+                        id="pan_registration_district"
                         type="text"
-                        value={guarantorDetails.pan_issued_district}
+                        value={guarantorDetails.pan_registration_district}
                         onChange={handleChange}
                         placeholder="DD/MM/YYYY"
                       />
-                      {errors.pan_issued_district && (
+                      {errors.pan_registration_district && (
                         <p className="text-red-600 text-sm">
-                          {errors.pan_issued_district}
+                          {errors.pan_registration_district}
                         </p>
                       )}
                     </div>
@@ -541,6 +557,70 @@ export function GuarantorDetailsTable({
                         <p className="text-red-600 text-sm">
                           {errors.offsprings}
                         </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Permanent Address*/}
+                  <h1 className="form-section-title">Permanent Address</h1>
+                  <div className="form-section-content-container">
+                    <div className="form-section-content">
+                      <Label htmlFor="province">Province</Label>
+                      <Input
+                        id="province"
+                        value={guarantorDetails.province}
+                        onChange={handleChange}
+                        placeholder="Enter grandfather's name"
+                      />
+                      {errors.province && (
+                        <p className="text-red-600 text-sm">
+                          {errors.province}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="form-section-content">
+                      <Label htmlFor="district">District</Label>
+                      <Input
+                        id="district"
+                        value={guarantorDetails.district}
+                        onChange={handleChange}
+                        placeholder="Enter father's name"
+                      />
+                      {errors.district && (
+                        <p className="text-red-600 text-sm">
+                          {errors.district}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="form-section-content">
+                      <Label htmlFor="vdc__municipality">
+                        VDC / Municipality
+                      </Label>
+                      <Input
+                        id="vdc__municipality"
+                        value={guarantorDetails.vdc__municipality}
+                        onChange={handleChange}
+                        placeholder="Enter mother's name"
+                      />
+                      {errors.vdc__municipality && (
+                        <p className="text-red-600 text-sm">
+                          {errors.vdc__municipality}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="form-section-content">
+                      <Label htmlFor="ward_no">Ward No.</Label>
+                      <Input
+                        id="ward_no"
+                        value={guarantorDetails.ward_no}
+                        onChange={handleChange}
+                        placeholder="Enter spouse's name (if applicable)"
+                      />
+                      {errors.ward_no && (
+                        <p className="text-red-600 text-sm">{errors.ward_no}</p>
                       )}
                     </div>
                   </div>

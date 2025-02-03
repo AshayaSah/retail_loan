@@ -230,7 +230,7 @@ const ApplicantDetails = ({
                   )}
                 </div>
 
-                {/* Email Address Field */}
+                {/* Client COde */}
                 <div className="form-section-content ">
                   <Label htmlFor="customer_client_code">
                     Client Code <span className="text-red-600">*</span>
@@ -811,6 +811,23 @@ const ApplicantDetails = ({
                     </p>
                   )}
                 </div>
+
+                <div className="form-section-content">
+                  <Label htmlFor="no_of_proposal">No. of Proposal</Label>
+                  <Input
+                    id="no_of_proposal"
+                    placeholder="Select Proposal"
+                    defaultValue="Multiple"
+                    {...register("no_of_proposal", {
+                      required: "No. of Proposal",
+                    })}
+                  />
+                  {errors.no_of_proposal && (
+                    <p className="text-red-600 text-sm">
+                      {errors.no_of_proposal.message}
+                    </p>
+                  )}
+                </div>
               </div>
             </>
           )}
@@ -819,7 +836,7 @@ const ApplicantDetails = ({
 
       <div className="pt-4">
         {!stepper[0].state &&
-          retailLoanData.is_existing_customer === "Existing" && (
+          retailLoanData.custom_client_type === "Existing" && (
             <div className="form-next-button">
               <Button type="button" onClick={() => handleStepper(0)}>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

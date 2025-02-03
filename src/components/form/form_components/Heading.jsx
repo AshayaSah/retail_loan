@@ -11,6 +11,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import BGImage from "../../../assets/bgImage.png";
 
 const Heading = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,17 +20,17 @@ const Heading = () => {
     <div
       className="relative h-[50vh] md:h-[50vh] bg-cover bg-center flex items-end"
       style={{
-        backgroundImage: "url('/placeholder.svg?height=1080&width=1920')",
+        backgroundImage: `url(${BGImage})`,
       }}
     >
       <div className="absolute inset-0 bg-black bg-opacity-40"></div>
       <div className="relative z-10 p-6 md:p-10 w-full">
-        <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
+        {/* <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
           Welcome to Our Platform
         </h1>
         <p className="text-xl text-white mb-8">
           Discover amazing features and possibilities
-        </p>
+        </p> */}
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
           <AlertDialogTrigger asChild>
             <Button>Check Pre-requirements</Button>

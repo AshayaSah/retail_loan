@@ -121,10 +121,11 @@ const Form = () => {
   // Form submission handler
   const onSubmit = () => {
     // e.preventDefault();
+    alert("Form Submitted");
     console.log("Form Submitted:", retailLoanData);
     adddPersonalInfo(retailLoanData);
 
-    // navigate("/");
+    navigate("/");
   };
 
   // Stepper object to track section completion
@@ -175,7 +176,7 @@ const Form = () => {
       <AppSidebar stepper={stepper} />
       <div className="flex-1">
         <Heading />
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form>
           <ApplicantDetails
             data={data}
             loading={loading}
@@ -239,7 +240,11 @@ const Form = () => {
               <Button variant="outline" type="button" className="">
                 Cancel
               </Button>
-              <Button type="submit" className="">
+              <Button
+                type="button"
+                onClick={handleSubmit(onSubmit)}
+                className=""
+              >
                 Submit Application
               </Button>
             </div>

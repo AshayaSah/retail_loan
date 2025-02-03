@@ -79,12 +79,24 @@ export function FacilityDetails({
     const proposalLimit = parseInt(proposal_limit);
     const baseRate = parseInt(base_rate);
     const irPremium = parseInt(ir_premium);
-    const interestProposed = parseInt(interest_proposed);
+    // const interestProposed = parseInt(interest_proposed);
 
+    // Convert annual interest rate to a monthly rate
+    const interestProposed = baseRate + irPremium;
+    const monthlyRate = interestProposed / 100 / 12;
+
+    // Calculate EMI
     const emi =
-      (proposalLimit * (1 + baseRate + irPremium + interestProposed)) /
-      tenureInMonths;
-    setFacilityDetails((prev) => ({ ...prev, emi: emi }));
+      (proposalLimit *
+        monthlyRate *
+        Math.pow(1 + monthlyRate, tenureInMonths)) /
+      (Math.pow(1 + monthlyRate, tenureInMonths) - 1);
+
+    setFacilityDetails((prev) => ({
+      ...prev,
+      emi: emi.toFixed(2),
+      interest_proposed: interestProposed,
+    }));
   };
 
   const deleteFacility = (id) => {
@@ -168,7 +180,7 @@ export function FacilityDetails({
               </div>
 
               <div className="form-section-content">
-                <Label htmlFor="proposal_limit">Proposal Limit</Label>
+                <Label htmlFor="proposal_limit">Loan Ammount</Label>
                 <Input
                   id="proposal_limit"
                   value={facilityDetails.proposal_limit}
