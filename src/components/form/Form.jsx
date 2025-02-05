@@ -128,7 +128,44 @@ const Form = () => {
     navigate("/");
     alert("Form Submitted");
   };
+  // Handle the beforeunload event to warn the user if there are unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      if (isDirty) {
+        const message = "You have unsaved changes. Do you really want to leave?";
+        event.returnValue = message; // Standard for most browsers
+        return message; // Some browsers still use this as well
+      }
+    };
 
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [isDirty]);
+
+  useEffect(() => {
+    const handlePopState = (event) => {
+      if (isDirty) {
+        const confirmLeave = window.confirm("You have unsaved changes. Do you really want to leave?");
+        if (!confirmLeave) {
+          // Prevent the default action of going back
+          window.history.pushState(null, null, window.location.href);
+        }
+      }
+    };
+
+    // Push a new state to the history stack
+    window.history.pushState(null, null, window.location.href);
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [isDirty]);
+
+  
   // Stepper object to track section completion
   const [stepper, setStepper] = useState([
     {
