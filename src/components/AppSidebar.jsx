@@ -1,6 +1,7 @@
 import React from "react";
 import { Calendar, Check, Home, Inbox, Search, Settings } from "lucide-react";
-import Logo from "@/assets/logo.png";
+// import Logo from "@/assets/logo.png";
+import CAS from "@/assets/CAS.jpg"
 import {
   Sidebar,
   SidebarContent,
@@ -20,7 +21,7 @@ const AppSidebar = ({ stepper }) => {
       <SidebarContent>
         <SidebarGroup>
           <SidebarTrigger />
-          <img src={Logo} alt="" />
+          <img src={CAS} alt="" />
           {/* <ModeToggle></ModeToggle> */}
         </SidebarGroup>
         <SidebarGroup>

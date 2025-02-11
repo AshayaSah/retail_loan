@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Controller, useWatch } from "react-hook-form";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -17,7 +16,7 @@ import { AlertCircle } from "lucide-react";
 import { TwoColumnFormLoadingScreen } from "../loading/TwoColumnLoading";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { ToastAction } from "@/components/ui/toast";
+import { provinceData, districtsNepali } from "./provincedetails";
 
 const ApplicantDetails = ({
   handleFetch,
@@ -25,7 +24,6 @@ const ApplicantDetails = ({
   error,
   register,
   errors,
-  isValid,
   setValue,
   control,
   handleSelectChange,
@@ -34,8 +32,12 @@ const ApplicantDetails = ({
   handleStepper,
 }) => {
   const [sameAddress, setSameAddress] = useState(false);
+  const [currentDate, setCurrentDate] = useState("");
+  const [citizenshipMinDate, setCitizenshipMinDate] = useState("");
+
 
   useEffect(() => {
+
     if (sameAddress) {
       setValue("current_province", retailLoanData.province);
       setValue("current_district", retailLoanData.district);
@@ -48,6 +50,7 @@ const ApplicantDetails = ({
       setValue("current_vdc_municipality", "");
       setValue("current_ward_no", "");
     }
+
   }, [
     sameAddress,
     retailLoanData.province,
@@ -57,7 +60,115 @@ const ApplicantDetails = ({
     setValue,
   ]);
 
+  useEffect(() => {
+    // This will run when the date_of_birth changes
+    const calculateMinCitizenshipDate = () => {
+      const dob = retailLoanData.date_of_birth;
+      const today = new Date(dob);
+
+      if (!dob || isNaN(today.getTime())) return;
+
+      // Add 16 years to the birthdate
+      const minEligibleDate = new Date(today);
+      minEligibleDate.setFullYear(today.getFullYear() + 16);
+
+      // Format the date to YYYY-MM-DD and set it as the minimum allowed date for citizenship issuance
+      setCitizenshipMinDate(minEligibleDate.toISOString().split("T")[0]);
+    };
+
+    calculateMinCitizenshipDate();
+  }, [retailLoanData.date_of_birth]);
+
+
   const { toast } = useToast();
+
+  const calculateAge = (dob) => {
+    if (!dob) return "";
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
+  };
+
+  const handleAgeCalculation = (event) => {
+    const dob = event.target.value;
+    const calculatedAge = calculateAge(dob);
+
+    if (calculatedAge < 0) {
+      alert("Error: Date of Birth cannot be in future.");
+      setValue("date_of_birth", "");
+      return;
+    }
+
+    if (calculatedAge < 18) {
+      alert("You must be at least 18 years old.");
+      setValue("date_of_birth", "");
+      return;
+    }
+    setValue("age", calculatedAge);
+  };
+
+  const [selectedProvince, setSelectedProvince] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [districts, setDistricts] = useState([]);
+  const [municipalities, setMunicipalities] = useState([]);
+
+  const handleProvinceChange = (value) => {
+    setSelectedProvince(value);
+    const selectedProvinceData = provinceData.find((p) => p.province === value);
+    setDistricts(selectedProvinceData ? selectedProvinceData.districts : []);
+    setSelectedDistrict("");
+    setMunicipalities([]);
+  };
+
+  const handleDistrictChange = (value) => {
+    setSelectedDistrict(value);
+    const selectedDistrictData = districts.find((d) => d.name === value);
+    setMunicipalities(selectedDistrictData ? selectedDistrictData.municipalities : []);
+  };
+
+  const handleMunicipalityChange = (value) => {
+    setValue("vdc_municipality", value);
+  };
+
+  const [currentProvince, setCurrentProvince] = useState("");
+  const [currentDistrict, setCurrentDistrict] = useState("");
+  const [currentDistricts, setCurrentDistricts] = useState([]);
+  const [currentMunicipalities, setCurrentMunicipalities] = useState([]);
+
+
+  const handleCurrentProvinceChange = (value) => {
+    console.log("The vaslue passsed by province change", currentProvince)
+    setCurrentProvince(value);
+    const selectedCurrentProvinceData = provinceData.find((p) => p.province === value);
+    console.log(selectedCurrentProvinceData);
+    setCurrentDistricts(selectedCurrentProvinceData ? selectedCurrentProvinceData.districts : []);
+    setCurrentDistrict("");
+    setCurrentMunicipalities([]);
+  };
+
+  useEffect(() => {
+    console.log("List of districts", currentDistricts)
+  }, [currentDistricts])
+
+  const handleCurrentDistrictChange = (value) => {
+    setCurrentDistrict(value);
+    const selectedCurrentDistrictData = currentDistricts.find((d) => d.name === value);
+    setCurrentMunicipalities(selectedCurrentDistrictData ? selectedCurrentDistrictData.municipalities : []);
+  };
+
+  const handleCurrentMunicipalityChange = (value) => {
+    setValue("current_vdc_municipality", value);
+  };
 
   return (
     <Card className="form-section shadow-lg mt-8">
@@ -81,8 +192,8 @@ const ApplicantDetails = ({
                   <SelectValue placeholder="Select an option" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Existing">Existing</SelectItem>
-                  <SelectItem value="Non-Existing">Non-Existing</SelectItem>
+                  <SelectItem value="Existing">Yes</SelectItem>
+                  <SelectItem value="Non-Existing">No</SelectItem>
                 </SelectContent>
               </Select>
             )}
@@ -92,7 +203,7 @@ const ApplicantDetails = ({
               {errors.custom_client_type.message}
             </p>
           )}
-          {retailLoanData.custom_client_type == "Non-Existing" ?
+          {retailLoanData.custom_client_type == "Non-Existing" ? (
             <div className="form-section-content-container-single pt-6">
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
@@ -101,8 +212,8 @@ const ApplicantDetails = ({
                   You must be a CAS Bank Customer to apply for Loan.
                 </AlertDescription>
               </Alert>
-            </div> : null
-          }
+            </div>
+          ) : null}
         </div>
       </div>
 
@@ -300,7 +411,9 @@ const ApplicantDetails = ({
                     id="date_of_birth"
                     type="date"
                     placeholder="Enter your date of Birth"
+                    max={currentDate}
                     {...register("date_of_birth", {
+                      onChange: handleAgeCalculation,
                       pattern: {
                         message: "Enter a valid Date of Birth",
                       },
@@ -310,6 +423,21 @@ const ApplicantDetails = ({
                     <p className="text-red-600 text-sm">
                       {errors.date_of_birth.message}
                     </p>
+                  )}
+                </div>
+
+                {/* Age */}
+                <div className="form-section-content">
+                  <Label htmlFor="age">Age</Label>
+                  <Input
+                    id="age"
+                    type="number"
+                    disabled
+                    placeholder="Age"
+                    {...register("age")}
+                  />
+                  {errors.age && (
+                    <p className="text-red-600 text-sm">{errors.age.message}</p>
                   )}
                 </div>
 
@@ -418,9 +546,8 @@ const ApplicantDetails = ({
                     {...register("citizenship_number", {
                       required: "Please, enter your citizenship number",
                       pattern: {
-                        value: /^[0-9]+$/,
-                        message:
-                          "Invalid citizenship number. Only digits are allowed.",
+                        value: /^\d+(-\d+)*$/,
+                        message: "Invalid format. Use numbers separated by dashes (-).",
                       },
                     })}
                   />
@@ -432,7 +559,7 @@ const ApplicantDetails = ({
                 </div>
 
                 <div className="form-section-content">
-                  <Label htmlFor="citizenship_issued_date">
+                  <Label htmlFor="chitizenship_issued_date">
                     Citizenship Issued Date{" "}
                     <span className="text-red-600">*</span>
                   </Label>
@@ -440,6 +567,8 @@ const ApplicantDetails = ({
                     id="citizenship_issued_date"
                     type="date"
                     placeholder="DD/MM/YYYY"
+                    min={citizenshipMinDate} // Restricts future dates
+                    // min={citizenshipMinDate} // Restricts to dates after 16 years of age
                     {...register("citizenship_issued_date", {
                       required: "Please, enter your citizenship issued date",
                       pattern: {
@@ -468,17 +597,11 @@ const ApplicantDetails = ({
                       <SelectValue placeholder="Select your district" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Kathmandu">Kathmandu</SelectItem>
-                      <SelectItem value="Bhaktapur">Bhaktapur</SelectItem>
-                      <SelectItem value="Lalitpur">Lalitpur</SelectItem>
-                      <SelectItem value="Chitwan">Chitwan</SelectItem>
-                      <SelectItem value="Pokhara">Pokhara</SelectItem>
-                      <SelectItem value="Morang">Morang</SelectItem>
-                      <SelectItem value="Sunsari">Sunsari</SelectItem>
-                      <SelectItem value="Jhapa">Jhapa</SelectItem>
-                      <SelectItem value="Dang">Dang</SelectItem>
-                      <SelectItem value="Banke">Banke</SelectItem>
-                      <SelectItem value="Bardiya">Bardiya</SelectItem>
+                      {districtsNepali.map((district) => (
+                        <SelectItem key={district} value={district}>
+                          {district}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   {errors.citizenship_issued_district && (
@@ -536,17 +659,11 @@ const ApplicantDetails = ({
                       <SelectValue placeholder="Select your district" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Kathmandu">Kathmandu</SelectItem>
-                      <SelectItem value="Bhaktapur">Bhaktapur</SelectItem>
-                      <SelectItem value="Lalitpur">Lalitpur</SelectItem>
-                      <SelectItem value="Chitwan">Chitwan</SelectItem>
-                      <SelectItem value="Pokhara">Pokhara</SelectItem>
-                      <SelectItem value="Morang">Morang</SelectItem>
-                      <SelectItem value="Sunsari">Sunsari</SelectItem>
-                      <SelectItem value="Jhapa">Jhapa</SelectItem>
-                      <SelectItem value="Dang">Dang</SelectItem>
-                      <SelectItem value="Banke">Banke</SelectItem>
-                      <SelectItem value="Bardiya">Bardiya</SelectItem>
+                      {districtsNepali.map((district) => (
+                        <SelectItem key={district} value={district}>
+                          {district}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   {errors.pan_registration_district && (
@@ -588,14 +705,7 @@ const ApplicantDetails = ({
                   <Input
                     id="grandfathers_name"
                     placeholder="Enter grandfather's name"
-                    {...register("grandfathers_name", {
-                      // required: "Grandfather's name is required",
-                      // pattern: {
-                      //   value: /^[A-Za-z\s]+$/,
-                      //   message:
-                      //     "Invalid name. Only letters and spaces are allowed.",
-                      // },
-                    })}
+                    {...register("grandfathers_name")}
                   />
                   {errors.grandfathers_name && (
                     <p className="text-red-600 text-sm">
@@ -611,11 +721,11 @@ const ApplicantDetails = ({
                     placeholder="Enter mother's name"
                     {...register("mothers_name", {
                       // required: "Mother's name is required",
-                      // pattern: {
-                      //   value: /^[A-Za-z\s]+$/,
-                      //   message:
-                      //     "Invalid name. Only letters and spaces are allowed.",
-                      // },
+                      pattern: {
+                        value: /^[A-Za-z\s]+$/,
+                        message:
+                          "Invalid name. Only letters and spaces are allowed.",
+                      },
                     })}
                   />
                   {errors.mothers_name && (
@@ -631,11 +741,11 @@ const ApplicantDetails = ({
                     id="spouse_name"
                     placeholder="Enter spouse's name (if applicable)"
                     {...register("spouse_name", {
-                      // pattern: {
-                      //   value: /^[A-Za-z\s]*$/,
-                      //   message:
-                      //     "Invalid name. Only letters and spaces are allowed.",
-                      // },
+                      pattern: {
+                        value: /^[A-Za-z\s]*$/,
+                        message:
+                          "Invalid name. Only letters and spaces are allowed.",
+                      },
                     })}
                   />
                   {errors.spouse_name && (
@@ -675,12 +785,27 @@ const ApplicantDetails = ({
               <div className="form-section-content-container pb-0">
                 <div className="form-section-content">
                   <Label htmlFor="province">Province</Label>
-                  <Input
-                    id="province"
-                    placeholder="Enter province"
-                    {...register("province", {
-                      required: "Province is required",
-                    })}
+                  <Controller
+                    name="province"
+                    control={control}
+                    rules={{ required: "Province is required" }}
+                    render={({ field }) => (
+                      <Select onValueChange={(value) => {
+                        field.onChange(value);
+                        handleProvinceChange(value);
+                      }} value={field.value}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your province" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {provinceData.map((province) => (
+                            <SelectItem key={province.province} value={province.province}>
+                              {province.province}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   />
                   {errors.province && (
                     <p className="text-red-600 text-sm">
@@ -691,28 +816,68 @@ const ApplicantDetails = ({
 
                 <div className="form-section-content">
                   <Label htmlFor="district">District</Label>
-                  <Input
-                    id="district"
-                    placeholder="Enter district"
-                    {...register("district", {
-                      required: "District is required",
-                    })}
+
+                  <Controller
+                    name="district"
+                    control={control}
+                    rules={{ required: "District is required" }}
+                    render={({ field }) => (
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          handleDistrictChange(value); // If needed for additional state updates
+                        }}
+                        value={field.value}
+                        disabled={!selectedProvince} // Disables if no province is selected
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a district" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {districts.map((district) => (
+                            <SelectItem key={district.name} value={district.name}>
+                              {district.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   />
+
                   {errors.district && (
-                    <p className="text-red-600 text-sm">
-                      {errors.district.message}
-                    </p>
+                    <p className="text-red-600 text-sm">{errors.district.message}</p>
                   )}
                 </div>
 
                 <div className="form-section-content">
-                  <Label htmlFor="vdc_municipality">VDC/Municipality</Label>
-                  <Input
-                    id="vdc_municipality"
-                    placeholder="Enter VDC/Municipality"
-                    {...register("vdc_municipality", {
-                      required: "This field is required",
-                    })}
+                  <Label htmlFor="district">VDC/Municipality</Label>
+                  <Controller
+                    name="vdc_municipality"
+                    control={control}
+                    rules={{ required: "VDC/Municipality is required" }}
+
+                    render={({ field }) => (
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          // handleDistrictChange(value);
+                          handleMunicipalityChange(value)
+                        }}
+                        value={field.value}
+                        disabled={!selectedDistrict}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select VDC/Municipality" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {municipalities.map((municipality) => (
+                            <SelectItem key={municipality} value={municipality}>
+                              {municipality}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   />
                   {errors.vdc_municipality && (
                     <p className="text-red-600 text-sm">
@@ -754,9 +919,10 @@ const ApplicantDetails = ({
               </div>
 
               {/* Current Address */}
-              <h1 className="form-section-title">Current Address</h1>
+              {/* <h1 className="form-section-title">Current Address</h1>
               <div className="form-section-content-container pb-0">
                 <div className="form-section-content">
+
                   <Label htmlFor="current_province">Province</Label>
                   <Input
                     id="current_province"
@@ -804,6 +970,109 @@ const ApplicantDetails = ({
                       {errors.current_vdc_municipality.message}
                     </p>
                   )}
+                </div> */}
+              {/* Current Address */}
+              <h1 className="form-section-title">Current Address</h1>
+              <div className="form-section-content-container pb-0">
+                <div className="form-section-content">
+                  <Label htmlFor="current_province">Province</Label>
+                  <Controller
+                    name="current_province"
+                    control={control}
+                    rules={{ required: "Province is required" }}
+                    render={({ field }) => (
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          handleCurrentProvinceChange(value);
+                          // setSameAddress(false);
+                        }}
+                        disabled={sameAddress}
+                        value={field.value}
+
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your province" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {provinceData.map((province) => (
+                            <SelectItem key={province.province} value={province.province}>
+                              {province.province}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.current_province && (
+                    <p className="text-red-600 text-sm">{errors.current_province.message}</p>
+                  )}
+                </div>
+
+                <div className="form-section-content">
+                  <Label htmlFor="current_district">District</Label>
+                  <Controller
+                    name="current_district"
+                    control={control}
+                    rules={{ required: "District is required" }}
+                    render={({ field }) => (
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          handleCurrentDistrictChange(value);
+                        }}
+                        value={field.value}
+                        disabled={!currentProvince || sameAddress} // Disable if no province is selected
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a district" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {currentDistricts.map((district) => (
+                            <SelectItem key={district.name} value={district.name}>
+                              {district.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.current_district && (
+                    <p className="text-red-600 text-sm">{errors.current_district.message}</p>
+                  )}
+                </div>
+
+                <div className="form-section-content">
+                  <Label htmlFor="current_vdc_municipality">VDC/Municipality</Label>
+                  <Controller
+                    name="current_vdc_municipality"
+                    control={control}
+                    rules={{ required: "This field is required" }}
+                    render={({ field }) => (
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          handleCurrentMunicipalityChange(value);
+                        }}
+                        value={field.value}
+                        disabled={!currentDistrict || sameAddress}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select VDC/Municipality" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {currentMunicipalities.map((municipality) => (
+                            <SelectItem key={municipality} value={municipality}>
+                              {municipality}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.current_vdc_municipality && (
+                    <p className="text-red-600 text-sm">{errors.current_vdc_municipality.message}</p>
+                  )}
                 </div>
 
                 <div className="form-section-content">
@@ -828,6 +1097,7 @@ const ApplicantDetails = ({
                   <Input
                     id="no_of_proposal"
                     placeholder="Select Proposal"
+                    disabled
                     defaultValue="Multiple"
                     {...register("no_of_proposal", {
                       required: "No. of Proposal",

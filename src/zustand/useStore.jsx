@@ -109,7 +109,9 @@ export const useAppStore = create((set) => ({
 
   adddPersonalInfo: async (data) => {
     const base_url = "192.168.10.41";
-    const addPersonalInfoUrl = `http://${base_url}/api/method/loan.api.create_retail_loan`;
+    // const addPersonalInfoUrl = `http://${base_url}/api/method/loan.api.create_retail_loan`;
+    const addPersonalInfoUrl = `http://${base_url}/api/resource/Retail Loan`;
+
     const authorizationToken = "6ae7332d5eccb12:e5faca4763d5930";
 
     try {

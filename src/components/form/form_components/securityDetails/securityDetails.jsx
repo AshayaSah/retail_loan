@@ -43,7 +43,7 @@ export function SecurityDetails({
     email: "",
     phone: "",
     property: "",
-    data_rqrw: "",
+    area: "",
     location_of_property: "",
     province: "",
     district: "",
@@ -53,7 +53,7 @@ export function SecurityDetails({
     plot_no: "",
     land_revenue_office: "",
     shape_of_land: "",
-    motoorable_road_access: "",
+    motorable_road_access: "",
     road_width: "",
     road_access_from: "",
     road_setbacks: "",
@@ -80,7 +80,7 @@ export function SecurityDetails({
           email: "",
           phone: "",
           property: "",
-          data_rqrw: "",
+          area: "",
           location_of_property: "",
           province: "",
           district: "",
@@ -90,7 +90,7 @@ export function SecurityDetails({
           plot_no: "",
           land_revenue_office: "",
           shape_of_land: "",
-          motoorable_road_access: "",
+          motorable_road_access: "",
           road_width: "",
           road_access_from: "",
           road_setbacks: "",
@@ -110,7 +110,7 @@ export function SecurityDetails({
         email: "",
         phone: "",
         property: "",
-        data_rqrw: "",
+        area: "",
         location_of_property: "",
         province: "",
         district: "",
@@ -120,7 +120,7 @@ export function SecurityDetails({
         plot_no: "",
         land_revenue_office: "",
         shape_of_land: "",
-        motoorable_road_access: "",
+        motorable_road_access: "",
         road_width: "",
         road_access_from: "",
         road_setbacks: "",
@@ -173,32 +173,34 @@ export function SecurityDetails({
         </Button>
       </div>
 
-      <div className="relative mb-4">
+      {/* <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
         <Input
           placeholder="Search by name or email"
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10 bg-gray-50 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
         />
-      </div>
+      </div> */}
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[200px]">Name of Owner</TableHead>
+            <TableHead className="w-[200px] font-bold">Name of Owner</TableHead>
             <TableHead className="w-[200px]">District</TableHead>
-            <TableHead className="w-[100px]">Total Value</TableHead>
+            <TableHead className="w-[100px]">Area (Sq.mt)</TableHead>
+            <TableHead className="w-[100px]">Location</TableHead>
+            <TableHead className="w-[100px]">Plot Number</TableHead>
             <TableHead className="w-[100px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {filteredPeople.map((person) => (
             <TableRow key={person.id}>
-              <TableCell className="font-medium">
-                {person.name_of_owner}
-              </TableCell>
+              <TableCell>{person.name_of_owner}</TableCell>
               <TableCell>{person.district}</TableCell>
               <TableCell>{person.area}</TableCell>
+              <TableCell>{person.location_of_property}</TableCell>
+              <TableCell>{person.plot_no}</TableCell>
               <TableCell className="pl-5">
                 <Button
                   variant="ghost"
@@ -223,7 +225,9 @@ export function SecurityDetails({
 
             <div className="grid grid-cols-3 gap-4">
               <div className="form-section-content">
-                <Label htmlFor="property">Property</Label>
+                <Label htmlFor="property">Property {" "} 
+                <span className="text-red-600">*</span>
+                </Label>
                 <Select
                   id="property"
                   onValueChange={(value) =>
@@ -263,18 +267,21 @@ export function SecurityDetails({
               <div className="form-section-content">
                 <Label htmlFor="data_rqrw">Area (Sq.mt)</Label>
                 <Input
-                  id="data_rqrw"
-                  value={securityDetails.data_rqrw}
+                  id="area"
+                  value={securityDetails.area}
                   onChange={handleChange}
                   placeholder="Enter area in square meters"
                 />
-                {errors.data_rqrw && (
-                  <p className="text-red-600 text-sm">{errors.data_rqrw}</p>
+                {errors.area && (
+                  <p className="text-red-600 text-sm">{errors.area}</p>
                 )}
               </div>
 
               <div className="form-section-content">
-                <Label htmlFor="location_of_property">Location</Label>
+                <Label htmlFor="location_of_property">Location
+                {" "} 
+                <span className="text-red-600">*</span>
+                </Label>
                 <Select
                   id="location_of_property"
                   onValueChange={(value) =>
@@ -461,6 +468,7 @@ export function SecurityDetails({
                     <SelectItem value="Kalikot">Kalikot</SelectItem>
                     <SelectItem value="Kanchanpur">Kanchanpur</SelectItem>
                     <SelectItem value="Kapilbastu">Kapilbastu</SelectItem>
+                    <SelectItem value="Kathmandu">Kathmandu</SelectItem>
                     <SelectItem value="Kaski">Kaski</SelectItem>
                     <SelectItem value="Katari">Katari</SelectItem>
                     <SelectItem value="Kavrepalanchowk">Kavrepalanchowk</SelectItem>

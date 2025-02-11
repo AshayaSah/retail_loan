@@ -5,8 +5,10 @@ import { Link } from "react-router-dom";
 const Hero = () => {
   return (
     <div
-      className="relative bg-cover bg-center h-screen"
-      style={{ backgroundImage: `url(${Image1})` }}
+      className="relative bg-cover bg-center h-[89vh]"
+      style={{ backgroundImage: `url(${Image1})`,
+        backgroundSize:`center center`
+    }}
     >
       <div className="absolute inset-0 bg-black opacity-50">
         <div className="max-w-7xl mx-auto relative z-10 text-white text-center py-20 px-4">

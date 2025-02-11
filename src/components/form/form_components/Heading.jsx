@@ -20,20 +20,20 @@ const Heading = () => {
     <div
       className="relative h-[50vh] md:h-[50vh] bg-cover bg-center flex items-end"
       style={{
-        backgroundImage: `url(${BGImage})`,
+        backgroundImage: `url(${BGImage})`
       }}
     >
-      <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-      <div className="relative z-10 p-6 md:p-10 w-full">
+      <div className="absolute inset-0 bg-black bg-opacity-10"></div>
+      <div className="relative z-10 p-8 md:p-14 w-full flex justify-center align-middle">
         {/* <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
           Welcome to Our Platform
         </h1>
         <p className="text-xl text-white mb-8">
           Discover amazing features and possibilities
         </p> */}
-        <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-          <AlertDialogTrigger asChild>
-            <Button>Check Pre-requirements</Button>
+        <AlertDialog open={isOpen} onOpenChange={setIsOpen} >
+          <AlertDialogTrigger asChild >
+            <Button className='h-[50px] text-sm'>Check Pre-requirements</Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -46,7 +46,7 @@ const Heading = () => {
                   <li>You have a valid email address</li>
                   <li>You agree to our terms of service</li>
                   <li>You have a stable internet connection</li>
-                  <li>You also need to have an Account in Cas Bank</li>
+                  <li>You also need to have an Account in CAS Bank</li>
                 </ul>
               </AlertDialogDescription>
             </AlertDialogHeader>

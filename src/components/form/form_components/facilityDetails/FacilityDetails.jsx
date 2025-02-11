@@ -31,14 +31,9 @@ export function FacilityDetails({
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [facilityDetails, setFacilityDetails] = useState({
     facility_type: "Housing Loan",
-    tenure: "",
+    tenure_in_months: "",
     proposal_limit: "",
-    base_rate: "",
-    ir_premium: "",
-    interest_proposed: "",
-    service_fees: "",
     purpose: "",
-    emi: "",
   });
 
   const addFacility = (e) => {
@@ -55,14 +50,9 @@ export function FacilityDetails({
 
     setFacilityDetails({
       facility_type: "",
-      tenure: "",
+      tenure_in_months: "",
       proposal_limit: "",
-      base_rate: "",
-      ir_premium: "",
-      interest_proposed: "",
-      service_fees: "",
       purpose: "",
-      emi: "",
     });
     setIsFormOpen(false);
   };
@@ -72,32 +62,32 @@ export function FacilityDetails({
     setFacilityDetails((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleEmi = () => {
-    const { tenure, proposal_limit, base_rate, ir_premium, interest_proposed } =
-      facilityDetails;
-    const tenureInMonths = parseInt(tenure);
-    const proposalLimit = parseInt(proposal_limit);
-    const baseRate = parseInt(base_rate);
-    const irPremium = parseInt(ir_premium);
-    // const interestProposed = parseInt(interest_proposed);
+  // const handleEmi = () => {
+  //   const { tenure, proposal_limit, base_rate, ir_premium, interest_proposed } =
+  //     facilityDetails;
+  //   const tenureInMonths = parseInt(tenure);
+  //   const proposalLimit = parseInt(proposal_limit);
+  //   const baseRate = parseInt(base_rate);
+  //   const irPremium = parseInt(ir_premium);
+  //   // const interestProposed = parseInt(interest_proposed);
 
-    // Convert annual interest rate to a monthly rate
-    const interestProposed = baseRate + irPremium;
-    const monthlyRate = interestProposed / 100 / 12;
+  //   // Convert annual interest rate to a monthly rate
+  //   const interestProposed = baseRate + irPremium;
+  //   const monthlyRate = interestProposed / 100 / 12;
 
-    // Calculate EMI
-    const emi =
-      (proposalLimit *
-        monthlyRate *
-        Math.pow(1 + monthlyRate, tenureInMonths)) /
-      (Math.pow(1 + monthlyRate, tenureInMonths) - 1);
+  //   // Calculate EMI
+  //   const emi =
+  //     (proposalLimit *
+  //       monthlyRate *
+  //       Math.pow(1 + monthlyRate, tenureInMonths)) /
+  //     (Math.pow(1 + monthlyRate, tenureInMonths) - 1);
 
-    setFacilityDetails((prev) => ({
-      ...prev,
-      emi: emi.toFixed(2),
-      interest_proposed: interestProposed,
-    }));
-  };
+  //   setFacilityDetails((prev) => ({
+  //     ...prev,
+  //     emi: emi.toFixed(2),
+  //     interest_proposed: interestProposed,
+  //   }));
+  // };
 
   const deleteFacility = (id) => {
     const updatedFacilities = facilities.filter(
@@ -124,6 +114,7 @@ export function FacilityDetails({
             <TableHead>Facility Type</TableHead>
             <TableHead>Tenure (Months)</TableHead>
             <TableHead>Proposal Limit</TableHead>
+            <TableCell>Purpose</TableCell>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -131,7 +122,7 @@ export function FacilityDetails({
           {facilities.map((facility) => (
             <TableRow key={facility.id}>
               <TableCell>{facility.facility_type}</TableCell>
-              <TableCell>{facility.tenure}</TableCell>
+              <TableCell>{facility.tenure_in_months}</TableCell>
               <TableCell>{facility.proposal_limit}</TableCell>
               <TableCell>{facility.purpose}</TableCell>
               <TableCell>
@@ -150,6 +141,9 @@ export function FacilityDetails({
 
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="max-w-[80%] max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+            <DialogTitle id="dialog-title">Add Facility</DialogTitle>
+          </DialogHeader>
           <form onSubmit={addFacility} className="space-y-4">
             <h1 className="form-section-title">Facility Details</h1>
 
@@ -166,10 +160,10 @@ export function FacilityDetails({
               </div>
 
               <div className="form-section-content">
-                <Label htmlFor="tenure">Tenure (In Months)</Label>
+                <Label htmlFor="tenure_in_months">Tenure (In Months)</Label>
                 <Input
-                  id="tenure"
-                  value={facilityDetails.tenure}
+                  id="tenure_in_months"
+                  value={facilityDetails.tenure_in_months}
                   onChange={handleChange}
                   placeholder="Enter tenure in months"
                   className="w-full h-10 p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -177,7 +171,7 @@ export function FacilityDetails({
               </div>
 
               <div className="form-section-content">
-                <Label htmlFor="proposal_limit">Loan Ammount</Label>
+                <Label htmlFor="proposal_limit">Loan Amount</Label>
                 <Input
                   id="proposal_limit"
                   value={facilityDetails.proposal_limit}

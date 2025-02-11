@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dialog";
 import { PlusCircle, Search, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { districtsNepali } from "../provincedetails";
 
 export function GuarantorDetailsTable({
   retailLoanData,
@@ -68,7 +69,7 @@ export function GuarantorDetailsTable({
       setTimeout(() => {
         setGuarantorDetails({
           ...guarantorDetails,
-          guarantor_name: "John Doe",
+          guarantor_name: "Jonathan Shrestha",
           email: "johndoe@example.com",
           citizenship_number: "1234567890",
           citizenship_issued_date: "2015-06-12",
@@ -80,10 +81,10 @@ export function GuarantorDetailsTable({
           district: "Kathmandu",
           vdc__municipality: "Kathmandu",
           ward_no: "10",
-          grandfathers_name: "Ram Bahadur Doe",
-          fathers_name: "Shyam Bahadur Doe",
-          mother_name: "Sita Doe",
-          spouse_name: "Rita Doe",
+          grandfathers_name: "Ram Bahadur Shrestha",
+          fathers_name: "Shyam Bahadur Shrestha",
+          mother_name: "Sita Shrestha",
+          spouse_name: "Rita Shrestha",
           offsprings: "2",
         });
       }, 1000);
@@ -227,6 +228,7 @@ export function GuarantorDetailsTable({
             <TableHead className="w-[200px]">Guarantor Name</TableHead>
             <TableHead className="w-[200px]">Email</TableHead>
             <TableHead className="w-[100px]">Phone</TableHead>
+            <TableHead className="w-[100px]">Province</TableHead>
             <TableHead className="w-[100px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -238,6 +240,7 @@ export function GuarantorDetailsTable({
               </TableCell>
               <TableCell>{person.email}</TableCell>
               <TableCell>{person.phone}</TableCell>
+              <TableCell>{person.province}</TableCell>
               <TableCell className="pl-5">
                 <Button
                   variant="ghost"
@@ -255,7 +258,7 @@ export function GuarantorDetailsTable({
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="max-w-[80%] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Add Guarantor</DialogTitle>
+            <DialogTitle id="dialog-title">Add Guarantor</DialogTitle>
           </DialogHeader>
           <form onSubmit={addPerson} className="space-y-4">
             <div>
@@ -296,7 +299,7 @@ export function GuarantorDetailsTable({
                   <div className="form-section-content-container">
                     <div className="form-section-content">
                       <Label htmlFor="account_number">Account Number {" "}
-                      <span className="text-red-600">*</span>
+                        <span className="text-red-600">*</span>
                       </Label>
                       <Input
                         id="account_number"
@@ -314,7 +317,7 @@ export function GuarantorDetailsTable({
                     {/* Phone Number */}
                     <div className="form-section-content">
                       <Label htmlFor="phone">Phone Number {" "}
-                      <span className="text-red-600">*</span>
+                        <span className="text-red-600">*</span>
                       </Label>
                       <Input
                         id="phone"
@@ -358,7 +361,7 @@ export function GuarantorDetailsTable({
                     {/* Email */}
                     <div className="form-section-content">
                       <Label htmlFor="email">Email Address{" "}
-                      <span className="text-red-600">*</span>
+                        <span className="text-red-600">*</span>
                       </Label>
                       <Input
                         id="email"
@@ -369,6 +372,23 @@ export function GuarantorDetailsTable({
                       />
                       {errors.email && (
                         <p className="text-red-600 text-sm">{errors.email}</p>
+                      )}
+                    </div>
+                    <div className="form-section-content">
+                      <Label htmlFor="nationality">Nationality{" "}
+                        <span className="text-red-600">*</span>
+                      </Label>
+                      <Input
+                        id="nationality"
+                        type="tel"
+                        value={guarantorDetails.nationality}
+                        defaultValue="Nepali"
+                        onChange={handleChange}
+                        placeholder="Enter your email"
+                        disabled
+                      />
+                      {errors.email && (
+                        <p className="text-red-600 text-sm">{errors.nationality}</p>
                       )}
                     </div>
                   </div>
@@ -414,7 +434,7 @@ export function GuarantorDetailsTable({
                       )}
                     </div>
 
-                    <div className="form-section-content">
+                    {/* <div className="form-section-content">
                       <Label htmlFor="citizenship_issued_district">
                         Citizenship Issued District
                       </Label>
@@ -430,7 +450,35 @@ export function GuarantorDetailsTable({
                           {errors.citizenship_issued_district}
                         </p>
                       )}
-                    </div>
+                    </div> */}
+
+                    <div className="form-section-content">
+                    <Label htmlFor="citizenship_issued_district">
+                        Citizenship Issued District
+                      </Label>
+                    <Select
+                      onValueChange={(value) =>
+                        handleChange("citizenship_issued_district", value)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Citizenship Issued district" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {districtsNepali.map((district) => (
+                          <SelectItem key={district} value={district}>
+                            {district}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.citizenship_issued_district && (
+                        <p className="text-red-600 text-sm">
+                          {errors.citizenship_issued_district}
+                        </p>
+                      )}
+                  </div>
+                    
 
                     <div className="form-section-content">
                       <Label htmlFor="pan_number">PAN Number</Label>
@@ -454,7 +502,7 @@ export function GuarantorDetailsTable({
                       </Label>
                       <Input
                         id="pan_registration_date"
-                        type="text"
+                        type="date"
                         value={guarantorDetails.pan_registration_date}
                         onChange={handleChange}
                         placeholder="DD/MM/YYYY"
@@ -466,7 +514,7 @@ export function GuarantorDetailsTable({
                       )}
                     </div>
 
-                    <div className="form-section-content">
+                    {/* <div className="form-section-content">
                       <Label htmlFor="pan_registration_district">
                         PAN Issued District
                       </Label>
@@ -482,9 +530,35 @@ export function GuarantorDetailsTable({
                           {errors.pan_registration_district}
                         </p>
                       )}
-                    </div>
+                    </div> */}
+                
+                  <div className="form-section-content">
+                    <Label htmlFor="pan_registration_district">
+                      Pan Issued District
+                    </Label>
+                    <Select
+                      onValueChange={(value) =>
+                        handleChange("pan_registration_district", value)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select your district" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {districtsNepali.map((district) => (
+                          <SelectItem key={district} value={district}>
+                            {district}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.pan_registration_district && (
+                      <p className="text-red-600 text-sm">
+                        {errors.pan_registration_district.message}
+                      </p>
+                    )}
                   </div>
-
+                  </div>
                   {/* Family Information Section */}
                   <h1 className="form-section-title">Family Information</h1>
                   <div className="form-section-content-container">

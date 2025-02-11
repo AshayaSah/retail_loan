@@ -26,9 +26,9 @@ const NavbarUpdated = () => {
   };
 
   return (
-    <div>
+    <div className="bg-background sticky top-0 left-0 z-10">
       <nav>
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+        <div className="max-w-7xl mx-auto max-h-[100dvh] px-4 py-4 flex justify-between items-center ">
           <div className="flex items-center">
             <Link to="/">
               <img

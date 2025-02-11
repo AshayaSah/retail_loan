@@ -153,19 +153,20 @@
 
   /* .form-section-content-container {
     @apply grid md:grid-cols-2 sm:grid-cols-1 gap-x-6 gap-y-4 py-6 rounded-b-[1rem];
-  }
+  } */
 
-  .form-section-content-container-single{
+  /* .form-section-content-container-single{
     @apply grid sm:grid-cols-1 gap-x-6 gap-y-4 py-6 rounded-b-[1rem];
-  }
+  } */
 
-  .form-section-title{
+  /* .form-section-title{
     @apply text-2xl font-bold pt-2
-  }
+  } */
 
-    .form-section-content {
+    /* .form-section-content {
     @apply flex flex-col gap-1;
   } */
+
 
   Label {
     @apply p-2;
@@ -174,6 +175,11 @@
   .form-next-button {
     @apply flex justify-end mt-6;
   }
+
+
+
+
+
 
   /* Title  */
   .form-section-title {
@@ -184,12 +190,11 @@
     @apply content-[''] block w-24 h-[3px] bg-primary rounded-full absolute bottom-0 left-0 transform scale-x-0 origin-left transition-all ease-in-out duration-500;
   }
   
-  /* .form-section-title:hover::after {
+  .form-section-title:hover::after {
     @apply scale-x-100;
-  } */
-   
-
+  }
   
+
 /* Form section containers */
 .form-section-content-container {
   @apply grid md:grid-cols-2 sm:grid-cols-1 gap-x-3 gap-y-2 py-3 rounded-b-[1rem];
@@ -200,29 +205,37 @@
 }
 
 .form-section-content-container-three {
-  @apply grid md:grid-cols-3 sm:grid-cols-1 gap-y-2 py-3 rounded-b-[1rem];
+  @apply grid md:grid-cols-3 sm:grid-cols-1  gap-y-2 py-3 rounded-b-[1rem];
 }
+
 
 /* Form content with subtle animation */
+/* .form-section-content {
+  @apply flex flex-col gap-1 px-3 py-2 bg-white opacity-0 transform translate-y-4 transition-all duration-500 ease-in-out;
+  animation: slideIn 0.7s ease-in-out forwards;
+} */
+
 .form-section-content {
-  @apply flex flex-col gap-1 px-3 py-2 bg-white transform translate-y-4 transition-all duration-500 ease-in-out;
-  animation: slideIn 0.8s ease-in-out forwards;
+  @apply flex flex-col gap-1 px-3 py-2 bg-white opacity-0 transform translate-y-4 transition-all duration-500 ease-in-out;
+  animation: slideIn 0.7s ease-in-out forwards;
 }
 
-/* .form-section-content:nth-child(odd) {
+.form-section-content:nth-child(odd) {
   animation-delay: 0.2s;
 }
 
 .form-section-content:nth-child(even) {
   animation-delay: 0.4s;
-}  */
+}
 
-/* Animation for smooth slide-in from the right */
+/* Animation for smooth fade-in and slide */
 @keyframes slideIn {
   0% {
+    opacity: 0;
     transform: translateX(50px);
   }
   100% {
+    opacity: 1;
     transform: translateX(0);
   }
 }
@@ -258,8 +271,8 @@
 
 /* Checkbox Container (ShadCN Checkbox) */
 .checkbox-container {
-  @apply flex items-center space-x-2 transform translate-y-2 transition-all duration-500 ease-in-out;
-  animation: slideUp 0.5s forwards;
+  @apply flex items-center space-x-2 opacity-0 transform translate-y-2 transition-all duration-500 ease-in-out;
+  animation: fadeSlideUp 0.5s forwards;
 }
 
 .checkbox-container label {
@@ -269,18 +282,6 @@
 .checkbox-container .shadcn-checkbox {
   @apply transition-all duration-200 ease-in-out border-muted rounded-md focus:ring-primary focus:ring-2 hover:ring-primary/30;
 }
-
-/* Animation for checkbox sliding up */
-@keyframes slideUp {
-  0% {
-    transform: translateY(10px);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-
-
 
 
 
@@ -316,8 +317,5 @@
   scrollbar-color: theme("colors.primary") theme("colors.muted/40");
 }
 
-
-
- 
   
 }

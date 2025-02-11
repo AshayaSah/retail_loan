@@ -7,39 +7,29 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 
 import {
-  Calendar,
-  Check,
-  Home,
-  Inbox,
-  Search,
-  Settings,
   User,
   Users,
   Building,
   Shield,
-  Eye,
 } from "lucide-react";
 
-import { AlertCircle } from "lucide-react";
 
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-
+import { Label } from "@radix-ui/react-dropdown-menu";
+import FancyAlert from "./alert/FancyAlert";
+import { Checkbox } from "../ui/checkbox";
 import AppSidebar from "../AppSidebar";
 import Heading from "./form_components/Heading";
 import ApplicantDetails from "./form_components/ApplicantDetails";
 import { GuarantorDetailsTable } from "./form_components/guarantor_details_table/GuarantorDetailsTable";
 import { SecurityDetails } from "./form_components/securityDetails/securityDetails";
 import { FacilityDetails } from "./form_components/facilityDetails/FacilityDetails";
-import { Label } from "@radix-ui/react-dropdown-menu";
-import { useToast } from "@/hooks/use-toast";
-import { ToastAction } from "@radix-ui/react-toast";
-import { Toaster } from "../ui/toaster";
 import Preview from "./form_components/preview/Preview";
 
 const Form = () => {
   // Initialize useForm
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const {
     data,
@@ -60,6 +50,8 @@ const Form = () => {
 
   const navigate = useNavigate();
   const [toast, setToast] = useState(null);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [tandC, setTandC] = useState(false);
 
   // Watch all form values at once
   const retailLoanData = useWatch({ control });
@@ -123,10 +115,12 @@ const Form = () => {
   const onSubmit = () => {
     // e.preventDefault();
     console.log("Form Submitted:", retailLoanData);
-    // adddPersonalInfo(retailLoanData);
-    
-    navigate("/");
-    alert("Form Submitted");
+    setIsSubmitted(true);
+    setAlertMessage(
+      "Your form has been submitted successfully!\nWait for your form to be Reviewed."
+    );
+    adddPersonalInfo(retailLoanData);
+    // setIsSubmitted(false)
   };
 
   // Stepper object to track section completion
@@ -152,11 +146,11 @@ const Form = () => {
       icon: Shield,
     },
 
-    {
-      state: false,
-      value: "Preview",
-      icon: Eye, // Use an eye icon for preview
-    },
+    // {
+    //   state: false,
+    //   value: "Preview",
+    //   icon: Eye, // Use an eye icon for preview
+    // },
   ]);
 
   // Function to update the stepper state for a specific index
@@ -236,23 +230,53 @@ const Form = () => {
               handleStepper={handleStepper}
             />
           )}
+
           {stepper[3].state && (
-            <Preview
-              data={retailLoanData}
-            />
-          )}
-          {stepper[3].state && (
-            <div className="form-section flex justify-end space-x-4">
-              <Button variant="outline" type="button" className="">
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                onClick={handleSubmit(onSubmit)}
-                className=""
-              >
-                Submit Application
-              </Button>
+            <div className="form-section">
+              {/* Terms and Conditions  */}
+              <div className="form-section-content">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="same_address"
+                    checked={tandC}
+                    onCheckedChange={(checked) => setTandC(checked)}
+                  />
+                  <Label htmlFor="same_address">
+                    I acknowledge that the information provided is accurate and
+                    has been reviewed diligently. I accept full responsibility
+                    for its completeness and correctness upon submission.
+                  </Label>
+                </div>
+              </div>
+
+              <div className=" flex justify-end space-x-4">
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => navigate("/")}
+                  className=""
+                >
+                  Cancel
+                </Button>
+                <Preview data={retailLoanData} />
+
+                <Button
+                  type="button"
+                  onClick={handleSubmit(onSubmit)}
+                  className=""
+                  disabled={!tandC || isSubmitted}
+                >
+                  {!isSubmitted ? "Submit Application" : "Submitted"}
+                </Button>
+
+                {/* Fancy Alert */}
+                {alertMessage && (
+                  <FancyAlert
+                    message={alertMessage}
+                    onClose={() => setAlertMessage("")}
+                  />
+                )}
+              </div>
             </div>
           )}
         </form>

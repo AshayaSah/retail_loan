@@ -1,0 +1,46 @@
+{
+    "data": [
+        {
+            "province": "Koshi province",
+            "districts": [
+                {
+                    "name": "Bhojpur",
+                    "municipalities": [
+                        "Salpasilichho",
+                        "Pauwadungma",
+                        "Arun",
+                        "Tyamke Maiyum",
+                        "Aamchok",
+                        "Ramprasad Rai",
+                        "Hatuwagadhi"
+                    ]
+                },
+                {
+                    "name": "Sunsari",
+                    "municipalities": [
+                        "Koshi",
+                        "Harinagara"
+                    ]
+                },
+                {
+                    "name": "Morang",
+                    "municipalities": [
+                        "Biratnagar"
+                    ]
+                }
+            ]
+        },
+        {
+            "province": "Madhesh province",
+            "districts": [
+                {
+                    "name": "Dhanusha",
+                    "municipalities": [
+                        "Janakpur",
+                        "Mithila"
+                    ]
+                }
+            ]
+        }
+    ]
+}
