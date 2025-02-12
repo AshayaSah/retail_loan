@@ -10,9 +10,9 @@ const Preview = ({ data }) => {
       <DialogTrigger asChild>
         <Button variant="outline">Open Preview</Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-[80vw] min-w-[800px]">
         <DialogHeader>
-          <DialogTitle>Preview </DialogTitle>
+          <DialogTitle>Customer Filled Information Preview </DialogTitle>
         </DialogHeader>
         <div className="space-y-6 max-h-[70vh] overflow-auto">
           <Section title="General Information">
@@ -23,7 +23,7 @@ const Preview = ({ data }) => {
             <InfoField label="Account No" value={data.account_number} />
           </Section>
 
-          <Section title="Citizenship & PAN Details">
+          <Section title="Citizenship and PAN Details">
             <InfoField label="Citizenship No" value={data.citizenship_number} />
             <InfoField label="Issued Date" value={data.citizenship_issued_date} />
             <InfoField label="Issued District" value={data.citizenship_issued_district} />
@@ -79,31 +79,36 @@ const InfoField = ({ label, value }) => (
 
 const DataTable = ({ title, data }) => {
   const fields = data.length > 0 ? Object.keys(data[0]).filter(field => field !== "id") : [];
+  
   return (
-    <section className="w-full overflow-x-auto bg-white p-4 rounded-lg shadow-md">
+    <section className="w-full bg-white p-4 rounded-lg shadow-md space-y-4">
       <h2 className="text-xl font-semibold mb-2">{title}</h2>
-      <table className="w-full border-collapse border border-gray-200">
-        <thead>
-          <tr className="bg-gray-100">
-            {fields.map((field, idx) => (
-              <th key={idx} className="border border-gray-200 p-2 text-left">
-                {field.replace(/_/g, " ").replace(/^./, char => char.toUpperCase())}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((item, rowIdx) => (
-            <tr key={rowIdx} className="hover:bg-gray-50 transition">
-              {fields.map((field, colIdx) => (
-                <td key={colIdx} className="border border-gray-200 p-2">
-                  {item[field] || "N/A"}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="space-y-4">
+        {data.map((item, rowIdx) => (
+          <Card key={rowIdx} className="p-4 rounded-lg shadow-md">
+             <div className="col-span-full mb-2">
+                <h3 className="text-lg font-semibold">
+                  {title} {rowIdx + 1}
+                </h3>
+              </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {fields.map((field, colIdx) => {
+                const label = field
+                  .replace(/_/g, " ")
+                  .replace(/(^\w|\s\w)/g, m => m.toUpperCase());
+                
+                return (
+                  <InfoField
+                    key={colIdx}
+                    label={label}
+                    value={item[field] || "N/A"}
+                  />
+                );
+              })}
+            </div>
+          </Card>
+        ))}
+      </div>
     </section>
   );
 };

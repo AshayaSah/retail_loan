@@ -6,13 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 import { Button } from "../ui/button";
 
-import {
-  User,
-  Users,
-  Building,
-  Shield,
-} from "lucide-react";
-
+import { User, Users, Building, Shield } from "lucide-react";
 
 import { Label } from "@radix-ui/react-dropdown-menu";
 import FancyAlert from "./alert/FancyAlert";
@@ -24,6 +18,7 @@ import { GuarantorDetailsTable } from "./form_components/guarantor_details_table
 import { SecurityDetails } from "./form_components/securityDetails/securityDetails";
 import { FacilityDetails } from "./form_components/facilityDetails/FacilityDetails";
 import Preview from "./form_components/preview/Preview";
+import GuarantorDetailsTest from "./form_components/guarantor_details_table/GuaranterDetailsTest";
 
 const Form = () => {
   // Initialize useForm
@@ -187,9 +182,8 @@ const Form = () => {
             stepper={stepper}
             handleStepper={handleStepper}
           />
-
           {stepper[0].state && (
-            <GuarantorDetailsTable
+            <GuarantorDetailsTest
               data={data}
               register={register}
               errors={errors}
@@ -202,6 +196,20 @@ const Form = () => {
               handleStepper={handleStepper}
             />
           )}
+          {/* {stepper[0].state && (
+            <GuarantorDetailsTable
+              data={data}
+              register={register}
+              errors={errors}
+              isValid={isValid}
+              setValue={setValue}
+              control={control}
+              retailLoanData={retailLoanData}
+              handleSelectChange={handleSelectChange}
+              stepper={stepper}
+              handleStepper={handleStepper}
+            />
+          )} */}
           {stepper[1].state && (
             <FacilityDetails
               data={data}

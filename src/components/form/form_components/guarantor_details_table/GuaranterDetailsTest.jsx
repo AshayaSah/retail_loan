@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,17 +28,20 @@ import { Edit2, PlusCircle, Search, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { provinceData, districtsNepali } from "../provincedetails";
 
-export function GuarantorDetailsTable({
+export default function GuarantorDetailsTest({
   retailLoanData,
   setValue,
   stepper,
   handleStepper,
+  register,
 }) {
   const [guarantors, setGuarantors] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [errors, setErrors] = useState({});
   const [editingId, setEditingId] = useState(null);
+  const [currentDate, setCurrentDate] = useState("");
+  const [citizenshipMinDate, setCitizenshipMinDate] = useState("");
 
   const [guarantorDetails, setGuarantorDetails] = useState({
     is_existing_customer: "",
@@ -46,6 +49,7 @@ export function GuarantorDetailsTable({
     guarantor_name: "",
     email: "",
     phone: "",
+    date_of_birth: "",
     citizenship_number: "",
     citizenship_issued_date: "",
     citizenship_issued_district: "",
@@ -71,14 +75,14 @@ export function GuarantorDetailsTable({
       setTimeout(() => {
         setGuarantorDetails({
           ...guarantorDetails,
-          guarantor_name: "Jonathan Shrestha",
+          guarantor_name: "Jonathan Shrestha",
           email: "johndoe@example.com",
           citizenship_number: "1234567890",
           citizenship_issued_date: "2015-06-12",
           citizenship_issued_district: "Kathmandu",
           pan_number: "987654321",
           pan_registration_date: "2015-06-12",
-          // pan_registration_district: "Kathmandu",
+          pan_registration_district: "Kathmandu",
           province: "Bagmati Province",
           district: "Kathmandu",
           vdc__municipality: "Kathmandu",
@@ -98,66 +102,69 @@ export function GuarantorDetailsTable({
 
     if (validate()) {
       const newPerson = { ...guarantorDetails, id: Date.now() };
-      setGuarantors([...guarantors, newPerson]);
+      const updatedGuarantors = [...guarantors, newPerson];
+      setGuarantors(updatedGuarantors);
+      setValue("table_ngjk", updatedGuarantors);
 
-      if (!retailLoanData.table_ngjk) {
-        setValue("table_ngjk", [newPerson]);
-        setGuarantorDetails({
-          is_existing_customer: "",
-          account_number: "",
-          guarantor_name: "",
-          email: "",
-          phone: "",
-          citizenship_number: "",
-          citizenship_issued_date: "",
-          citizenship_issued_district: "",
-          pan_number: "",
-          pan_registration_date: "",
-          pan_registration_district: "",
-          province: "",
-          district: "",
-          vdc__municipality: "",
-          ward_no: "",
-          grandfathers_name: "",
-          fathers_name: "",
-          mother_name: "",
-          spouse_name: "",
-          offsprings: "",
-        });
-        setIsFormOpen(false);
-        return;
-      }
-      // Update retailLoanData to append this person to the guarantors array
-      const updatedGuarantors = [...retailLoanData.table_ngjk, newPerson];
-      setValue("table_ngjk", updatedGuarantors); // This will update the `guarantors` in the useForm hook
-
-      // Clear form data and close the form after adding
-      setGuarantorDetails({
-        is_existing_customer: "",
-        account_number: "",
-        guarantor_name: "",
-        email: "",
-        phone: "",
-        citizenship_number: "",
-        citizenship_issued_date: "",
-        citizenship_issued_district: "",
-        pan_number: "",
-        pan_registration_date: "",
-        pan_registration_district: "",
-        province: "",
-        district: "",
-        vdc__municipality: "",
-        ward_no: "",
-        grandfathers_name: "",
-        fathers_name: "",
-        mother_name: "",
-        spouse_name: "",
-        offsprings: "",
-      });
-      setIsFormOpen(false);
+      clearForm();
     }
   };
 
+  const editPerson = (e) => {
+    e.preventDefault();
+
+    if (validate()) {
+      const updatedGuarantors = guarantors.map((person) =>
+        person.id === editingId
+          ? { ...guarantorDetails, id: editingId }
+          : person
+      );
+
+      setGuarantors(updatedGuarantors);
+      setValue("table_ngjk", updatedGuarantors);
+      setEditingId(null);
+      setIsFormOpen(false);
+      clearForm();
+    }
+  };
+
+  const handleEdit = (e, id) => {
+    e.preventDefault();
+    const guarantorToEdit = guarantors.find((person) => person.id === id);
+    if (guarantorToEdit) {
+      setGuarantorDetails(guarantorToEdit);
+      setEditingId(id);
+      setIsFormOpen(true);
+    }
+  };
+
+  const clearForm = () => {
+    setGuarantorDetails({
+      is_existing_customer:'',
+      name_of_owner: "",
+      email: "",
+      phone: "",
+      property: "",
+      area: "",
+      location_of_property: "",
+      province: "",
+      district: "",
+      vdcmunicipality: "",
+      ward_no: "",
+      placestreet_name: "",
+      plot_no: "",
+      land_revenue_office: "",
+      shape_of_land: "",
+      motorable_road_access: "",
+      road_width: "",
+      road_access_from: "",
+      road_setbacks: "",
+      river_setbacks: "",
+      high_tension_setbacks: "",
+    });
+    setIsFormOpen(false);
+    setErrors({});
+  };
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -197,18 +204,88 @@ export function GuarantorDetailsTable({
     setValue("guarantors", updatedPeople);
   };
 
-
   const filteredPeople = guarantors.filter(
     (person) =>
       person.guarantor_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       person.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  useEffect(() => {
+    // This will run when the date_of_birth changes
+    const calculateMinCitizenshipDate = () => {
+      const dob = retailLoanData.date_of_birth;
+      const today = new Date(dob);
+
+      if (!dob || isNaN(today.getTime())) return;
+
+      // Add 16 years to the birthdate
+      const minEligibleDate = new Date(today);
+      minEligibleDate.setFullYear(today.getFullYear() + 16);
+
+      // Format the date to YYYY-MM-DD and set it as the minimum allowed date for citizenship issuance
+      setCitizenshipMinDate(minEligibleDate.toISOString().split("T")[0]);
+    };
+
+    calculateMinCitizenshipDate();
+  }, [guarantorDetails.date_of_birth]);
+
+  const calculateAge = (dob) => {
+    if (!dob) return "";
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
+  };
+
+  const handleAgeCalculation = (event) => {
+    const dob = event.target.value;
+    const calculatedAge = calculateAge(dob);
+
+    if (calculatedAge < 0) {
+      alert("Error: Date of Birth cannot be in future.");
+      setValue("date_of_birth", "");
+      return;
+    }
+
+    if (calculatedAge < 18) {
+      alert("You must be at least 18 years old.");
+      setValue("date_of_birth", "");
+      return;
+    }
+    setValue("age", calculatedAge);
+  };
+
+  const handleAgeChangeandCalculation = (e) => {
+    handleAgeCalculation(e);
+    handleChange(e);
+  };
+
+  const handleClose = () => {
+    clearForm();
+    setIsFormOpen(false);
+  };
+
   return (
     <Card className="form-section shadow-lg">
       <div className="flex justify-between items-center mb-6">
         <h1 className="form-section-title">Guarantor Details</h1>
-        <Button type="button" onClick={() => setIsFormOpen(true)}>
+        <Button
+          type="button"
+          onClick={() => {
+            setEditingId(null);
+            clearForm();
+            setIsFormOpen(true);
+          }}
+        >
           <PlusCircle className="mr-2 h-4 w-4" /> Add Guarantor
         </Button>
       </div>
@@ -242,12 +319,20 @@ export function GuarantorDetailsTable({
               <TableCell>{person.phone}</TableCell>
               <TableCell>{person.province}</TableCell>
               <TableCell className="flex gap-3">
-              <Button
+                <Button
                   variant="ghost"
-                  onClick={() => deletePerson(person.id)}
-                  className="p-1 hover:bg-red-100"
+                  onClick={(e) => handleEdit(e, person.id)}
+                  className="p-1 hover:bg-blue-100"
                 >
-                  <Trash2 className="h-4 w-4 text-red-500" />
+                  <Edit2 className="h-4 w-4 text-blue-500" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  type="button"
+                  onClick={() => deletePerson(person.id)}
+                  className="flex items-center justify-center p-2 bg-gray-200 text-red-500 rounded-lg shadow-md transition-transform transform hover:scale-105 hover:bg-red-100"
+                >
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </TableCell>
             </TableRow>
@@ -258,9 +343,14 @@ export function GuarantorDetailsTable({
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="max-w-[80%] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle id="dialog-title">Add Guarantor</DialogTitle>
+            <DialogTitle id="dialog-title">
+              {editingId ? "Edit Guarantor" : "Add Guarantor"}
+            </DialogTitle>
           </DialogHeader>
-          <form onSubmit={addPerson} className="space-y-4">
+          <form
+            onSubmit={!!editingId ? editPerson : addPerson}
+            className="space-y-4"
+          >
             <div>
               <div className="form-section-content-container-single py-0">
                 <h1 className="form-section-title">Guarantor Details</h1>
@@ -271,6 +361,7 @@ export function GuarantorDetailsTable({
                   </Label>
                   <Select
                     id="is_existing_customer"
+                    value={guarantorDetails.is_existing_customer}
                     onValueChange={(value) =>
                       handleChange({
                         target: { id: "is_existing_customer", value },
@@ -357,7 +448,25 @@ export function GuarantorDetailsTable({
                         </p>
                       )}
                     </div>
-
+                    {/* Date of Birth */}
+                    <div className="form-section-content ">
+                      <Label htmlFor="date_of_birth">
+                        Date of Birth <span className="text-red-600">*</span>
+                      </Label>
+                      <Input
+                        id="date_of_birth"
+                        type="date"
+                        value={guarantorDetails.date_of_birth}
+                        onChange={handleAgeChangeandCalculation}
+                        placeholder="Enter your date of Birth"
+                        max={currentDate}
+                      />
+                      {errors.date_of_birth && (
+                        <p className="text-red-600 text-sm">
+                          {errors.date_of_birth.message}
+                        </p>
+                      )}
+                    </div>
                     {/* Email */}
                     <div className="form-section-content">
                       <Label htmlFor="email">
@@ -425,6 +534,7 @@ export function GuarantorDetailsTable({
                       <Input
                         id="citizenship_issued_date"
                         type="date"
+                        min={citizenshipMinDate}
                         value={guarantorDetails.citizenship_issued_date}
                         onChange={handleChange}
                         placeholder="DD/MM/YYYY"
@@ -442,6 +552,7 @@ export function GuarantorDetailsTable({
                       </Label>
                       <Select
                         id="citizenship_issued_district"
+                        value={guarantorDetails.citizenship_issued_district}
                         onValueChange={(value) =>
                           handleChange({
                             target: {
@@ -509,6 +620,7 @@ export function GuarantorDetailsTable({
                       </Label>
                       <Select
                         id="pan_registration_district"
+                        value={guarantorDetails.pan_registration_district} 
                         onValueChange={(value) =>
                           handleChange({
                             target: { id: "pan_registration_district", value },
@@ -532,32 +644,6 @@ export function GuarantorDetailsTable({
                         </p>
                       )}
                     </div>
-                    {/* <div className="form-section-content">
-                      <Label htmlFor="citizenship_issued_district">
-                        Citizenship Issued District
-                      </Label>
-                      <Select
-                        onValueChange={(value) =>
-                          handleChange("citizenship_issued_district", value)
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Citizenship Issued district" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {districtsNepali.map((district) => (
-                            <SelectItem key={district} value={district}>
-                              {district}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {errors.citizenship_issued_district && (
-                        <p className="text-red-600 text-sm">
-                          {errors.citizenship_issued_district}
-                        </p>
-                      )}
-                    </div> */}
                   </div>
                   {/* Family Information Section */}
                   <h1 className="form-section-title">Family Information</h1>
@@ -709,11 +795,7 @@ export function GuarantorDetailsTable({
             </div>
 
             <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsFormOpen(false)}
-              >
+              <Button type="button" variant="outline" onClick={handleClose}>
                 Cancel
               </Button>
               <Button type="submit">{editingId ? "Update" : "Submit"}</Button>

@@ -35,9 +35,7 @@ const ApplicantDetails = ({
   const [currentDate, setCurrentDate] = useState("");
   const [citizenshipMinDate, setCitizenshipMinDate] = useState("");
 
-
   useEffect(() => {
-
     if (sameAddress) {
       setValue("current_province", retailLoanData.province);
       setValue("current_district", retailLoanData.district);
@@ -50,7 +48,6 @@ const ApplicantDetails = ({
       setValue("current_vdc_municipality", "");
       setValue("current_ward_no", "");
     }
-
   }, [
     sameAddress,
     retailLoanData.province,
@@ -78,7 +75,6 @@ const ApplicantDetails = ({
 
     calculateMinCitizenshipDate();
   }, [retailLoanData.date_of_birth]);
-
 
   const { toast } = useToast();
 
@@ -133,7 +129,9 @@ const ApplicantDetails = ({
   const handleDistrictChange = (value) => {
     setSelectedDistrict(value);
     const selectedDistrictData = districts.find((d) => d.name === value);
-    setMunicipalities(selectedDistrictData ? selectedDistrictData.municipalities : []);
+    setMunicipalities(
+      selectedDistrictData ? selectedDistrictData.municipalities : []
+    );
   };
 
   const handleMunicipalityChange = (value) => {
@@ -145,25 +143,34 @@ const ApplicantDetails = ({
   const [currentDistricts, setCurrentDistricts] = useState([]);
   const [currentMunicipalities, setCurrentMunicipalities] = useState([]);
 
-
   const handleCurrentProvinceChange = (value) => {
-    console.log("The vaslue passsed by province change", currentProvince)
+    console.log("The vaslue passsed by province change", currentProvince);
     setCurrentProvince(value);
-    const selectedCurrentProvinceData = provinceData.find((p) => p.province === value);
+    const selectedCurrentProvinceData = provinceData.find(
+      (p) => p.province === value
+    );
     console.log(selectedCurrentProvinceData);
-    setCurrentDistricts(selectedCurrentProvinceData ? selectedCurrentProvinceData.districts : []);
+    setCurrentDistricts(
+      selectedCurrentProvinceData ? selectedCurrentProvinceData.districts : []
+    );
     setCurrentDistrict("");
     setCurrentMunicipalities([]);
   };
 
   useEffect(() => {
-    console.log("List of districts", currentDistricts)
-  }, [currentDistricts])
+    console.log("List of districts", currentDistricts);
+  }, [currentDistricts]);
 
   const handleCurrentDistrictChange = (value) => {
     setCurrentDistrict(value);
-    const selectedCurrentDistrictData = currentDistricts.find((d) => d.name === value);
-    setCurrentMunicipalities(selectedCurrentDistrictData ? selectedCurrentDistrictData.municipalities : []);
+    const selectedCurrentDistrictData = currentDistricts.find(
+      (d) => d.name === value
+    );
+    setCurrentMunicipalities(
+      selectedCurrentDistrictData
+        ? selectedCurrentDistrictData.municipalities
+        : []
+    );
   };
 
   const handleCurrentMunicipalityChange = (value) => {
@@ -547,7 +554,8 @@ const ApplicantDetails = ({
                       required: "Please, enter your citizenship number",
                       pattern: {
                         value: /^\d+(-\d+)*$/,
-                        message: "Invalid format. Use numbers separated by dashes (-).",
+                        message:
+                          "Invalid format. Use numbers separated by dashes (-).",
                       },
                     })}
                   />
@@ -790,16 +798,22 @@ const ApplicantDetails = ({
                     control={control}
                     rules={{ required: "Province is required" }}
                     render={({ field }) => (
-                      <Select onValueChange={(value) => {
-                        field.onChange(value);
-                        handleProvinceChange(value);
-                      }} value={field.value}>
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          handleProvinceChange(value);
+                        }}
+                        value={field.value}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select your province" />
                         </SelectTrigger>
                         <SelectContent>
                           {provinceData.map((province) => (
-                            <SelectItem key={province.province} value={province.province}>
+                            <SelectItem
+                              key={province.province}
+                              value={province.province}
+                            >
                               {province.province}
                             </SelectItem>
                           ))}
@@ -835,7 +849,10 @@ const ApplicantDetails = ({
                         </SelectTrigger>
                         <SelectContent>
                           {districts.map((district) => (
-                            <SelectItem key={district.name} value={district.name}>
+                            <SelectItem
+                              key={district.name}
+                              value={district.name}
+                            >
                               {district.name}
                             </SelectItem>
                           ))}
@@ -845,7 +862,9 @@ const ApplicantDetails = ({
                   />
 
                   {errors.district && (
-                    <p className="text-red-600 text-sm">{errors.district.message}</p>
+                    <p className="text-red-600 text-sm">
+                      {errors.district.message}
+                    </p>
                   )}
                 </div>
 
@@ -855,13 +874,12 @@ const ApplicantDetails = ({
                     name="vdc_municipality"
                     control={control}
                     rules={{ required: "VDC/Municipality is required" }}
-
                     render={({ field }) => (
                       <Select
                         onValueChange={(value) => {
                           field.onChange(value);
                           // handleDistrictChange(value);
-                          handleMunicipalityChange(value)
+                          handleMunicipalityChange(value);
                         }}
                         value={field.value}
                         disabled={!selectedDistrict}
@@ -917,63 +935,241 @@ const ApplicantDetails = ({
                   </Label>
                 </div>
               </div>
-
-              {/* Current Address */}
-              {/* <h1 className="form-section-title">Current Address</h1>
-              <div className="form-section-content-container pb-0">
-                <div className="form-section-content">
-
-                  <Label htmlFor="current_province">Province</Label>
-                  <Input
-                    id="current_province"
-                    placeholder="Enter province"
-                    {...register("current_province", {
-                      required: "Province is required",
-                    })}
-                  />
-                  {errors.current_province && (
-                    <p className="text-red-600 text-sm">
-                      {errors.current_province.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="form-section-content">
-                  <Label htmlFor="current_district">District</Label>
-                  <Input
-                    id="current_district"
-                    placeholder="Enter district"
-                    {...register("current_district", {
-                      required: "District is required",
-                    })}
-                  />
-                  {errors.current_district && (
-                    <p className="text-red-600 text-sm">
-                      {errors.current_district.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="form-section-content">
-                  <Label htmlFor="current_vdc_municipality">
-                    VDC/Municipality
-                  </Label>
-                  <Input
-                    id="current_vdc_municipality"
-                    placeholder="Enter VDC/Municipality"
-                    {...register("current_vdc_municipality", {
-                      required: "This field is required",
-                    })}
-                  />
-                  {errors.current_vdc_municipality && (
-                    <p className="text-red-600 text-sm">
-                      {errors.current_vdc_municipality.message}
-                    </p>
-                  )}
-                </div> */}
+              
               {/* Current Address */}
               <h1 className="form-section-title">Current Address</h1>
               <div className="form-section-content-container pb-0">
+                {sameAddress ? (
+                  <>
+                    <div className="form-section-content">
+                      <Label htmlFor="current_province">Province</Label>
+                      <Input
+                        id="current_province"
+                        disabled={sameAddress}
+                        placeholder="Enter province"
+                        {...register("current_province", {
+                          required: "Province is required",
+                        })}
+                      />
+                      {errors.current_province && (
+                        <p className="text-red-600 text-sm">
+                          {errors.current_province.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="form-section-content">
+                      <Label htmlFor="current_district">District</Label>
+                      <Input
+                        id="current_district"
+                        placeholder="Enter district"
+                        disabled={sameAddress}
+                        {...register("current_district", {
+                          required: "District is required",
+                        })}
+                      />
+                      {errors.current_district && (
+                        <p className="text-red-600 text-sm">
+                          {errors.current_district.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="form-section-content">
+                      <Label htmlFor="current_vdc_municipality">
+                        VDC/Municipality
+                      </Label>
+                      <Input
+                        id="current_vdc_municipality"
+                        disabled={sameAddress}
+                        placeholder="Enter VDC/Municipality"
+                        {...register("current_vdc_municipality", {
+                          required: "This field is required",
+                        })}
+                      />
+                      {errors.current_vdc_municipality && (
+                        <p className="text-red-600 text-sm">
+                          {errors.current_vdc_municipality.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="form-section-content">
+                      <Label htmlFor="current_ward_no">Ward No</Label>
+                      <Input
+                        id="current_ward_no"
+                        type="number"
+                        disabled={sameAddress}
+                        placeholder="Enter ward number"
+                        {...register("current_ward_no", {
+                          required: "Ward number is required",
+                        })}
+                      />
+                      {errors.current_ward_no && (
+                        <p className="text-red-600 text-sm">
+                          {errors.current_ward_no.message}
+                        </p>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="form-section-content">
+                      <Label htmlFor="current_province">Province</Label>
+                      <Controller
+                        name="current_province"
+                        control={control}
+                        rules={{ required: "Province is required" }}
+                        render={({ field }) => (
+                          <Select
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              handleCurrentProvinceChange(value);
+                              // setSameAddress(false);
+                            }}
+                            disabled={sameAddress}
+                            value={field.value}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select your province" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {provinceData.map((province) => (
+                                <SelectItem
+                                  key={province.province}
+                                  value={province.province}
+                                >
+                                  {province.province}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      {errors.current_province && (
+                        <p className="text-red-600 text-sm">
+                          {errors.current_province.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="form-section-content">
+                      <Label htmlFor="current_district">District</Label>
+                      <Controller
+                        name="current_district"
+                        control={control}
+                        rules={{ required: "District is required" }}
+                        render={({ field }) => (
+                          <Select
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              handleCurrentDistrictChange(value);
+                            }}
+                            value={field.value}
+                            disabled={!currentProvince || sameAddress} // Disable if no province is selected
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a district" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {currentDistricts.map((district) => (
+                                <SelectItem
+                                  key={district.name}
+                                  value={district.name}
+                                >
+                                  {district.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      {errors.current_district && (
+                        <p className="text-red-600 text-sm">
+                          {errors.current_district.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="form-section-content">
+                      <Label htmlFor="current_vdc_municipality">
+                        VDC/Municipality
+                      </Label>
+                      <Controller
+                        name="current_vdc_municipality"
+                        control={control}
+                        rules={{ required: "This field is required" }}
+                        render={({ field }) => (
+                          <Select
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              handleCurrentMunicipalityChange(value);
+                            }}
+                            value={field.value}
+                            disabled={!currentDistrict || sameAddress}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select VDC/Municipality" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {currentMunicipalities.map((municipality) => (
+                                <SelectItem
+                                  key={municipality}
+                                  value={municipality}
+                                >
+                                  {municipality}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      {errors.current_vdc_municipality && (
+                        <p className="text-red-600 text-sm">
+                          {errors.current_vdc_municipality.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="form-section-content">
+                      <Label htmlFor="current_ward_no">Ward No</Label>
+                      <Input
+                        id="current_ward_no"
+                        type="number"
+                        placeholder="Enter ward number"
+                        {...register("current_ward_no", {
+                          required: "Ward number is required",
+                        })}
+                      />
+                      {errors.current_ward_no && (
+                        <p className="text-red-600 text-sm">
+                          {errors.current_ward_no.message}
+                        </p>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                <div className="form-section-content">
+                  <Label htmlFor="no_of_proposal">No. of Proposal</Label>
+                  <Input
+                    id="no_of_proposal"
+                    placeholder="Select Proposal"
+                    disabled
+                    defaultValue="Multiple"
+                    {...register("no_of_proposal", {
+                      required: "No. of Proposal",
+                    })}
+                  />
+                  {errors.no_of_proposal && (
+                    <p className="text-red-600 text-sm">
+                      {errors.no_of_proposal.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* <div className="form-section-content-container pb-0">
                 <div className="form-section-content">
                   <Label htmlFor="current_province">Province</Label>
                   <Controller
@@ -989,14 +1185,16 @@ const ApplicantDetails = ({
                         }}
                         disabled={sameAddress}
                         value={field.value}
-
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select your province" />
                         </SelectTrigger>
                         <SelectContent>
                           {provinceData.map((province) => (
-                            <SelectItem key={province.province} value={province.province}>
+                            <SelectItem
+                              key={province.province}
+                              value={province.province}
+                            >
                               {province.province}
                             </SelectItem>
                           ))}
@@ -1005,7 +1203,9 @@ const ApplicantDetails = ({
                     )}
                   />
                   {errors.current_province && (
-                    <p className="text-red-600 text-sm">{errors.current_province.message}</p>
+                    <p className="text-red-600 text-sm">
+                      {errors.current_province.message}
+                    </p>
                   )}
                 </div>
 
@@ -1029,7 +1229,10 @@ const ApplicantDetails = ({
                         </SelectTrigger>
                         <SelectContent>
                           {currentDistricts.map((district) => (
-                            <SelectItem key={district.name} value={district.name}>
+                            <SelectItem
+                              key={district.name}
+                              value={district.name}
+                            >
                               {district.name}
                             </SelectItem>
                           ))}
@@ -1038,12 +1241,16 @@ const ApplicantDetails = ({
                     )}
                   />
                   {errors.current_district && (
-                    <p className="text-red-600 text-sm">{errors.current_district.message}</p>
+                    <p className="text-red-600 text-sm">
+                      {errors.current_district.message}
+                    </p>
                   )}
                 </div>
 
                 <div className="form-section-content">
-                  <Label htmlFor="current_vdc_municipality">VDC/Municipality</Label>
+                  <Label htmlFor="current_vdc_municipality">
+                    VDC/Municipality
+                  </Label>
                   <Controller
                     name="current_vdc_municipality"
                     control={control}
@@ -1071,7 +1278,9 @@ const ApplicantDetails = ({
                     )}
                   />
                   {errors.current_vdc_municipality && (
-                    <p className="text-red-600 text-sm">{errors.current_vdc_municipality.message}</p>
+                    <p className="text-red-600 text-sm">
+                      {errors.current_vdc_municipality.message}
+                    </p>
                   )}
                 </div>
 
@@ -1109,7 +1318,7 @@ const ApplicantDetails = ({
                     </p>
                   )}
                 </div>
-              </div>
+              </div> */}
             </>
           )}
         </>
