@@ -14,6 +14,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { ModeToggle } from "./ModeToggle";
+import { Label } from "@radix-ui/react-dropdown-menu";
 
 const AppSidebar = ({ stepper }) => {
   return (
@@ -25,9 +26,9 @@ const AppSidebar = ({ stepper }) => {
           {/* <ModeToggle></ModeToggle> */}
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-">
+          <Label className="text-lg font-bold bg-gray">
             Home Loan Form
-          </SidebarGroupLabel>
+          </Label>
           <SidebarGroupContent>
             <SidebarMenu>
               {stepper.map((item) => (

@@ -66,7 +66,9 @@ const provinceData = [
         {
           name: "Khotang",
           municipalities: [
-            "Diktel�Rupakot�Majuwagadhi",
+            "Diktel",
+            "Rupakot",
+            "Majuwagadhi",
             "Halesi Tuwachung",
             "Khotehang",
             "Diprung",
@@ -212,7 +214,7 @@ const provinceData = [
       ]
     },
     {
-      province: "Madesh Province",
+      province: "Madhesh Province",
       districts: [
         {
           name: "Saptari",

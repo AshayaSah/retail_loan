@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,7 +24,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { PlusCircle, Search, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { districtsNepali } from "../provincedetails";
 
@@ -39,58 +38,118 @@ export function SecurityDetails({
   const [securities, setSecurities] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
-  // Initialize useForm
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      name_of_owner: "",
-      email: "",
-      phone: "",
-      property: "",
-      area: "",
-      location_of_property: "",
-      province: "",
-      district: "",
-      vdcmunicipality: "",
-      ward_no: "",
-      placestreet_name: "",
-      plot_no: "",
-      land_revenue_office: "",
-      shape_of_land: "",
-      motorable_road_access: "",
-      road_width: "",
-      road_access_from: "",
-      road_setbacks: "",
-      river_setbacks: "",
-      high_tension_setbacks: "",
-    },
+  const [errors, setErrors] = useState({});
+  const [securityDetails, setSecurityDetails] = useState({
+    name_of_owner: "",
+    email: "",
+    phone: "",
+    property: "",
+    area: "",
+    location_of_property: "",
+    province: "",
+    district: "",
+    vdcmunicipality: "",
+    ward_no: "",
+    placestreet_name: "",
+    plot_no: "",
+    land_revenue_office: "",
+    shape_of_land: "",
+    motorable_road_access: "",
+    road_width: "",
+    road_access_from: "",
+    road_setbacks: "",
+    river_setbacks: "",
+    high_tension_setbacks: "",
   });
 
   useEffect(() => {
-    console.log("Securities Data: ", securities);
-  }, [securities]);
+    console.log("Security Data: ", securityDetails);
+  }, [securityDetails]);
 
-  const addPerson = (data) => {
-    const newPerson = { ...data, id: Date.now() };
-    setSecurities((prev) => [...prev, newPerson]);
+  const addPerson = (e) => {
+    e.preventDefault();
 
-    if (!retailLoanData.table_drge) {
-      setValue("table_drge", [newPerson]);
-    } else {
+    if (validate()) {
+      console.log("Here");
+      const newPerson = { ...securityDetails, id: Date.now() };
+      setSecurities([...securities, newPerson]);
+
+      if (!retailLoanData.table_drge) {
+        setValue("table_drge", [newPerson]);
+        setSecurityDetails({
+          name_of_owner: "",
+          email: "",
+          phone: "",
+          property: "",
+          area: "",
+          location_of_property: "",
+          province: "",
+          district: "",
+          vdcmunicipality: "",
+          ward_no: "",
+          placestreet_name: "",
+          plot_no: "",
+          land_revenue_office: "",
+          shape_of_land: "",
+          motorable_road_access: "",
+          road_width: "",
+          road_access_from: "",
+          road_setbacks: "",
+          river_setbacks: "",
+          high_tension_setbacks: "",
+        });
+        setIsFormOpen(false);
+        return;
+      }
+
       const updatedGuarantors = [...retailLoanData.table_drge, newPerson];
       setValue("table_drge", updatedGuarantors);
-    }
 
-    // Clear form data and close the form after adding
-    reset();
-    setIsFormOpen(false);
+      // Clear form data and close the form after adding
+      setSecurityDetails({
+        name_of_owner: "",
+        email: "",
+        phone: "",
+        property: "",
+        area: "",
+        location_of_property: "",
+        province: "",
+        district: "",
+        vdcmunicipality: "",
+        ward_no: "",
+        placestreet_name: "",
+        plot_no: "",
+        land_revenue_office: "",
+        shape_of_land: "",
+        motorable_road_access: "",
+        road_width: "",
+        road_access_from: "",
+        road_setbacks: "",
+        river_setbacks: "",
+        high_tension_setbacks: "",
+      });
+      setIsFormOpen(false);
+    }
   };
 
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setSecurityDetails((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const validate = () => {
+    const newErrors = {};
+
+    if (!securityDetails.property) {
+      newErrors.property = "Property is required.";
+    }
+    if (!securityDetails.location_of_property) {
+      newErrors.location_of_property = "Location is required.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
   const deletePerson = (id) => {
     const updatedPeople = securities.filter((person) => person.id !== id);
     setSecurities(updatedPeople);
@@ -111,6 +170,15 @@ export function SecurityDetails({
           <PlusCircle className="mr-2 h-4 w-4" /> Add Security
         </Button>
       </div>
+
+      {/* <div className="relative mb-4">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+        <Input
+          placeholder="Search by name or email"
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10 bg-gray-50 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+        />
+      </div> */}
 
       <Table>
         <TableHeader>
@@ -150,7 +218,7 @@ export function SecurityDetails({
           <DialogHeader>
             <DialogTitle>Add Realstate Security</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit(addPerson)} className="space-y-4">
+          <form onSubmit={addPerson} className="space-y-4">
             <h1 className="form-section-title">Property Details</h1>
 
             <div className="grid grid-cols-3 gap-4">
@@ -160,12 +228,11 @@ export function SecurityDetails({
                 </Label>
                 <Select
                   id="property"
-                  {...register("property", {
-                    required: "Property is required.",
-                  })} // Register input with validation
-                  onValueChange={(value) => {
-                    setValue("property", value);
-                  }}
+                  onValueChange={(value) =>
+                    handleChange({
+                      target: { id: "property", value },
+                    })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select" />
@@ -178,9 +245,7 @@ export function SecurityDetails({
                   </SelectContent>
                 </Select>
                 {errors.property && (
-                  <p className="text-red-600 text-sm">
-                    {errors.property.message}
-                  </p>
+                  <p className="text-red-600 text-sm">{errors.property}</p>
                 )}
               </div>
 
@@ -188,25 +253,25 @@ export function SecurityDetails({
                 <Label htmlFor="name_of_owner">Name of Owner</Label>
                 <Input
                   id="name_of_owner"
-                  {...register("name_of_owner")} // Register input with validation
+                  value={securityDetails.name_of_owner}
+                  onChange={handleChange}
                   placeholder="Enter owner's full name"
                 />
                 {errors.name_of_owner && (
-                  <p className="text-red-600 text-sm">
-                    {errors.name_of_owner.message}
-                  </p>
+                  <p className="text-red-600 text-sm">{errors.name_of_owner}</p>
                 )}
               </div>
 
               <div className="form-section-content">
-                <Label htmlFor="area">Area (Sq.mt)</Label>
+                <Label htmlFor="data_rqrw">Area (Sq.mt)</Label>
                 <Input
                   id="area"
-                  {...register("area")} // Register input with validation
+                  value={securityDetails.area}
+                  onChange={handleChange}
                   placeholder="Enter area in square meters"
                 />
                 {errors.area && (
-                  <p className="text-red-600 text-sm">{errors.area.message}</p>
+                  <p className="text-red-600 text-sm">{errors.area}</p>
                 )}
               </div>
 
@@ -216,10 +281,11 @@ export function SecurityDetails({
                 </Label>
                 <Select
                   id="location_of_property"
-                  {...register("location_of_property")} // Register input with validation
-                  onValueChange={(value) => {
-                    setValue("location_of_property", value);
-                  }}
+                  onValueChange={(value) =>
+                    handleChange({
+                      target: { id: "location_of_property", value },
+                    })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Enter location" />
@@ -236,7 +302,7 @@ export function SecurityDetails({
                 </Select>
                 {errors.location_of_property && (
                   <p className="text-red-600 text-sm">
-                    {errors.location_of_property.message}
+                    {errors.location_of_property}
                   </p>
                 )}
               </div>
@@ -245,13 +311,12 @@ export function SecurityDetails({
                 <Label htmlFor="province">Province</Label>
                 <Input
                   id="province"
-                  {...register("province")} // Register input
+                  value={securityDetails.province}
+                  onChange={handleChange}
                   placeholder="Enter province"
                 />
                 {errors.province && (
-                  <p className="text-red-600 text-sm">
-                    {errors.province.message}
-                  </p>
+                  <p className="text-red-600 text-sm">{errors.province}</p>
                 )}
               </div>
 
@@ -259,13 +324,12 @@ export function SecurityDetails({
                 <Label htmlFor="district">District</Label>
                 <Input
                   id="district"
-                  {...register("district")} // Register input
+                  value={securityDetails.district}
+                  onChange={handleChange}
                   placeholder="Enter district"
                 />
                 {errors.district && (
-                  <p className="text-red-600 text-sm">
-                    {errors.district.message}
-                  </p>
+                  <p className="text-red-600 text-sm">{errors.district}</p>
                 )}
               </div>
 
@@ -273,12 +337,13 @@ export function SecurityDetails({
                 <Label htmlFor="vdcmunicipality">VDC/Municipality</Label>
                 <Input
                   id="vdcmunicipality"
-                  {...register("vdcmunicipality")} // Register input
+                  value={securityDetails.vdcmunicipality}
+                  onChange={handleChange}
                   placeholder="Enter VDC/Municipality"
                 />
                 {errors.vdcmunicipality && (
                   <p className="text-red-600 text-sm">
-                    {errors.vdcmunicipality.message}
+                    {errors.vdcmunicipality}
                   </p>
                 )}
               </div>
@@ -287,13 +352,12 @@ export function SecurityDetails({
                 <Label htmlFor="ward_no">Ward No</Label>
                 <Input
                   id="ward_no"
-                  {...register("ward_no")} // Register input
+                  value={securityDetails.ward_no}
+                  onChange={handleChange}
                   placeholder="Enter ward number"
                 />
                 {errors.ward_no && (
-                  <p className="text-red-600 text-sm">
-                    {errors.ward_no.message}
-                  </p>
+                  <p className="text-red-600 text-sm">{errors.ward_no}</p>
                 )}
               </div>
 
@@ -301,12 +365,13 @@ export function SecurityDetails({
                 <Label htmlFor="placestreet_name">Place (Street Name)</Label>
                 <Input
                   id="placestreet_name"
-                  {...register("placestreet_name")} // Register input
+                  value={securityDetails.placestreet_name}
+                  onChange={handleChange}
                   placeholder="Enter street name"
                 />
                 {errors.placestreet_name && (
                   <p className="text-red-600 text-sm">
-                    {errors.placestreet_name.message}
+                    {errors.placestreet_name}
                   </p>
                 )}
               </div>
@@ -315,27 +380,29 @@ export function SecurityDetails({
                 <Label htmlFor="plot_no">Plot No</Label>
                 <Input
                   id="plot_no"
-                  {...register("plot_no")} // Register input
+                  value={securityDetails.plot_no}
+                  onChange={handleChange}
                   placeholder="Enter plot number"
                 />
                 {errors.plot_no && (
-                  <p className="text-red-600 text-sm">
-                    {errors.plot_no.message}
-                  </p>
+                  <p className="text-red-600 text-sm">{errors.plot_no}</p>
                 )}
               </div>
 
+              {/* Land Revenue Office */}
               <div className="form-section-content">
-                <Label htmlFor="land_revenue_office">Land Revenue Office</Label>
+              <Label htmlFor="land_revenue_office">Land Revenue Office</Label>
                 <Select
                   id="land_revenue_office"
-                  {...register("land_revenue_office")} // Register input with validation
-                  onValueChange={(value) => {
-                    setValue("land_revenue_office", value);
-                  }}
+                  value={securityDetails.land_revenue_office}
+                  onValueChange={(value) =>
+                    handleChange({
+                      target: { id: "land_revenue_office", value },
+                    })
+                  }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select Land Revenue Office" />
+                    <SelectValue placeholder="Select Land Revenue Office " />
                   </SelectTrigger>
                   <SelectContent>
                     {districtsNepali.map((district) => (
@@ -347,7 +414,7 @@ export function SecurityDetails({
                 </Select>
                 {errors.land_revenue_office && (
                   <p className="text-red-600 text-sm">
-                    {errors.land_revenue_office.message}
+                    {errors.land_revenue_office}
                   </p>
                 )}
               </div>
@@ -359,10 +426,11 @@ export function SecurityDetails({
                 <Label htmlFor="shape_of_land">Shape of Land</Label>
                 <Select
                   id="shape_of_land"
-                  {...register("shape_of_land")} // Register input with validation
-                  onValueChange={(value) => {
-                    setValue("shape_of_land", value);
-                  }}
+                  onValueChange={(value) =>
+                    handleChange({
+                      target: { id: "shape_of_land", value },
+                    })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Enter shape of land" />
@@ -378,22 +446,19 @@ export function SecurityDetails({
                   </SelectContent>
                 </Select>
                 {errors.shape_of_land && (
-                  <p className="text-red-600 text-sm">
-                    {errors.shape_of_land.message}
-                  </p>
+                  <p className="text-red-600 text-sm">{errors.shape_of_land}</p>
                 )}
               </div>
 
               <div className="form-section-content">
-                <Label htmlFor="motorable_road_access">
-                  Motorable Road Access
-                </Label>
+                <Label htmlFor="road_access">Motorable Road Access</Label>
                 <Select
-                  id="motorable_road_access"
-                  {...register("motorable_road_access")} // Register input with validation
-                  onValueChange={(value) => {
-                    setValue("motorable_road_access", value);
-                  }}
+                  id="motoorable_road_access"
+                  onValueChange={(value) =>
+                    handleChange({
+                      target: { id: "motoorable_road_access", value },
+                    })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select" />
@@ -403,10 +468,8 @@ export function SecurityDetails({
                     <SelectItem value="No">No</SelectItem>
                   </SelectContent>
                 </Select>
-                {errors.motorable_road_access && (
-                  <p className="text-red-600 text-sm">
-                    {errors.motorable_road_access.message}
-                  </p>
+                {errors.road_access && (
+                  <p className="text-red-600 text-sm">{errors.road_access}</p>
                 )}
               </div>
 
@@ -414,10 +477,11 @@ export function SecurityDetails({
                 <Label htmlFor="road_width">Road Width</Label>
                 <Select
                   id="road_width"
-                  {...register("road_width")} // Register input with validation
-                  onValueChange={(value) => {
-                    setValue("road_width", value);
-                  }}
+                  onValueChange={(value) =>
+                    handleChange({
+                      target: { id: "road_width", value },
+                    })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Enter road width" />
@@ -442,9 +506,7 @@ export function SecurityDetails({
                   </SelectContent>
                 </Select>
                 {errors.road_width && (
-                  <p className="text-red-600 text-sm">
-                    {errors.road_width.message}
-                  </p>
+                  <p className="text-red-600 text-sm">{errors.road_width}</p>
                 )}
               </div>
 
@@ -452,10 +514,11 @@ export function SecurityDetails({
                 <Label htmlFor="road_access_from">Road Access From</Label>
                 <Select
                   id="road_access_from"
-                  {...register("road_access_from")} // Register input with validation
-                  onValueChange={(value) => {
-                    setValue("road_access_from", value);
-                  }}
+                  onValueChange={(value) =>
+                    handleChange({
+                      target: { id: "road_access_from", value },
+                    })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Enter access point" />
@@ -469,7 +532,7 @@ export function SecurityDetails({
                 </Select>
                 {errors.road_access_from && (
                   <p className="text-red-600 text-sm">
-                    {errors.road_access_from.message}
+                    {errors.road_access_from}
                   </p>
                 )}
               </div>
@@ -478,10 +541,11 @@ export function SecurityDetails({
                 <Label htmlFor="road_setbacks">Any Road Setbacks?</Label>
                 <Select
                   id="road_setbacks"
-                  {...register("road_setbacks")} // Register input with validation
-                  onValueChange={(value) => {
-                    setValue("road_setbacks", value);
-                  }}
+                  onValueChange={(value) =>
+                    handleChange({
+                      target: { id: "road_setbacks", value },
+                    })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select" />
@@ -492,9 +556,7 @@ export function SecurityDetails({
                   </SelectContent>
                 </Select>
                 {errors.road_setbacks && (
-                  <p className="text-red-600 text-sm">
-                    {errors.road_setbacks.message}
-                  </p>
+                  <p className="text-red-600 text-sm">{errors.road_setbacks}</p>
                 )}
               </div>
 
@@ -504,10 +566,11 @@ export function SecurityDetails({
                 </Label>
                 <Select
                   id="river_setbacks"
-                  {...register("river_setbacks")} // Register input with validation
-                  onValueChange={(value) => {
-                    setValue("river_setbacks", value);
-                  }}
+                  onValueChange={(value) =>
+                    handleChange({
+                      target: { id: "river_setbacks", value },
+                    })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select" />
@@ -519,7 +582,7 @@ export function SecurityDetails({
                 </Select>
                 {errors.river_setbacks && (
                   <p className="text-red-600 text-sm">
-                    {errors.river_setbacks.message}
+                    {errors.river_setbacks}
                   </p>
                 )}
               </div>
@@ -530,10 +593,11 @@ export function SecurityDetails({
                 </Label>
                 <Select
                   id="high_tension_setbacks"
-                  {...register("high_tension_setbacks")} // Register input with validation
-                  onValueChange={(value) => {
-                    setValue("high_tension_setbacks", value);
-                  }}
+                  onValueChange={(value) =>
+                    handleChange({
+                      target: { id: "river_setbacks", value },
+                    })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select" />
@@ -545,7 +609,7 @@ export function SecurityDetails({
                 </Select>
                 {errors.high_tension_setbacks && (
                   <p className="text-red-600 text-sm">
-                    {errors.high_tension_setbacks.message}
+                    {errors.high_tension_setbacks}
                   </p>
                 )}
               </div>
@@ -568,7 +632,7 @@ export function SecurityDetails({
       {!stepper[3].state && (
         <div className="form-next-button">
           <Button type="button" onClick={() => handleStepper(3)}>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           </Button>
         </div>
       )}

@@ -14,7 +14,7 @@ const Preview = ({ data }) => {
         <DialogHeader>
           <DialogTitle>Customer Filled Information Preview </DialogTitle>
         </DialogHeader>
-        <div className="space-y-6 max-h-[70vh] overflow-auto">
+        <div className="space-y-4 p-4 max-h-[70vh] overflow-auto">
           <Section title="General Information">
             <InfoField label="Client Type" value={data.custom_client_type} />
             <InfoField label="Full Name" value={data.custom_customer_name} />
@@ -31,6 +31,7 @@ const Preview = ({ data }) => {
             <InfoField label="PAN Registration Date" value={data.pan_registration_date} />
             <InfoField label="PAN Registration District" value={data.pan_registration_district} />
           </Section>
+          
           <Section title="Family Information">
             <InfoField label="Father's Name" value={data.fathers_name} />
             <InfoField label="Grandfather's Name" value={data.grandfathers_name} />
@@ -81,7 +82,7 @@ const DataTable = ({ title, data }) => {
   const fields = data.length > 0 ? Object.keys(data[0]).filter(field => field !== "id") : [];
   
   return (
-    <section className="w-full bg-white p-4 rounded-lg shadow-md space-y-4">
+    <section className="w-full bg-white p-2 rounded-lg space-y-4">
       <h2 className="text-xl font-semibold mb-2">{title}</h2>
       <div className="space-y-4">
         {data.map((item, rowIdx) => (

@@ -1,24 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
-
+import { User, Users, Building, Shield } from "lucide-react";
 import { useAppStore } from "../../zustand/useStore";
+import { useForm, useWatch } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
-import { Button } from "../ui/button";
-
-import { User, Users, Building, Shield } from "lucide-react";
-
 import { Label } from "@radix-ui/react-dropdown-menu";
-import FancyAlert from "./alert/FancyAlert";
+import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
+
 import AppSidebar from "../AppSidebar";
 import Heading from "./form_components/Heading";
 import ApplicantDetails from "./form_components/ApplicantDetails";
 import { GuarantorDetailsTable } from "./form_components/guarantor_details_table/GuarantorDetailsTable";
-import { SecurityDetails } from "./form_components/securityDetails/securityDetails";
+import { SecurityDetails } from "./form_components/securityDetails/securityDetailsEx";
 import { FacilityDetails } from "./form_components/facilityDetails/FacilityDetails";
 import Preview from "./form_components/preview/Preview";
-import GuarantorDetailsTest from "./form_components/guarantor_details_table/GuaranterDetailsTest";
+import GuarantorDetailsTest from "./form_components/guarantor_details_table/GuaranterDetailsTestEx";
+import FancyAlert from "./alert/FancyAlert";
 
 const Form = () => {
   // Initialize useForm
@@ -100,7 +98,7 @@ const Form = () => {
         Object.keys(fetchData).forEach((key) => setValue(key, fetchData[key]));
 
         setLoading(false);
-      }, [1000]);
+      }, 500);
     } else {
       return setError(true);
     }
@@ -118,45 +116,35 @@ const Form = () => {
     // setIsSubmitted(false)
   };
 
-  // Stepper object to track section completion
   const [stepper, setStepper] = useState([
     {
       state: false,
       value: "Applicant Details",
-      icon: User, // Use a user-related icon for applicant details
+      icon: User,
     },
     {
       state: false,
       value: "Guarantor Details",
-      icon: Users, // Use a group-related icon for guarantors
+      icon: Users,
     },
     {
       state: false,
       value: "Facility Details",
-      icon: Building, // Use a building-related icon for facility details
+      icon: Building,
     },
     {
       state: false,
       value: "Security Details",
       icon: Shield,
     },
-
-    // {
-    //   state: false,
-    //   value: "Preview",
-    //   icon: Eye, // Use an eye icon for preview
-    // },
   ]);
 
   // Function to update the stepper state for a specific index
   const handleStepper = (index) => {
     console.log(index);
     setStepper((prevStepper) =>
-      prevStepper.map(
-        (step, idx) =>
-          idx === index
-            ? { ...step, state: true } // Update the state for the specific index
-            : step // Keep other steps unchanged
+      prevStepper.map((step, idx) =>
+        idx === index ? { ...step, state: true } : step
       )
     );
   };

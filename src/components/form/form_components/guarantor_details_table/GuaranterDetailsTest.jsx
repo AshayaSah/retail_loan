@@ -67,6 +67,31 @@ export default function GuarantorDetailsTest({
     offsprings: "",
   });
 
+  const [activeProvince, setActiveProvince] = useState("");
+  const [activeDistrict, setActiveDistrict] = useState("");
+  const [availableDistricts, setAvailableDistricts] = useState([]);
+  const [availableMunicipalities, setAvailableMunicipalities] = useState([]);
+
+  const onProvinceChange = (value) => {
+    setActiveProvince(value);
+    const provinceDataFound = provinceData.find((p) => p.province === value);
+    setAvailableDistricts(provinceDataFound ? provinceDataFound.districts : []);
+    setActiveDistrict("");
+    setAvailableMunicipalities([]);
+  };
+
+  const onDistrictChange = (value) => {
+    setActiveDistrict(value);
+    const districtDataFound = availableDistricts.find((d) => d.name === value);
+    setAvailableMunicipalities(
+      districtDataFound ? districtDataFound.municipalities : []
+    );
+  };
+
+  const onMunicipalityChange = (value) => {
+    setValue("vdc__municipality", value);
+  };
+
   const handleFetch = () => {
     if (
       guarantorDetails.account_number == "13420002008" &&
@@ -140,27 +165,27 @@ export default function GuarantorDetailsTest({
 
   const clearForm = () => {
     setGuarantorDetails({
-      is_existing_customer:'',
-      name_of_owner: "",
+      is_existing_customer: "",
+      account_number: "",
+      guarantor_name: "",
       email: "",
       phone: "",
-      property: "",
-      area: "",
-      location_of_property: "",
+      date_of_birth: "",
+      citizenship_number: "",
+      citizenship_issued_date: "",
+      citizenship_issued_district: "",
+      pan_number: "",
+      pan_registration_date: "",
+      pan_registration_district: "",
       province: "",
       district: "",
-      vdcmunicipality: "",
+      vdc__municipality: "",
       ward_no: "",
-      placestreet_name: "",
-      plot_no: "",
-      land_revenue_office: "",
-      shape_of_land: "",
-      motorable_road_access: "",
-      road_width: "",
-      road_access_from: "",
-      road_setbacks: "",
-      river_setbacks: "",
-      high_tension_setbacks: "",
+      grandfathers_name: "",
+      fathers_name: "",
+      mother_name: "",
+      spouse_name: "",
+      offsprings: "",
     });
     setIsFormOpen(false);
     setErrors({});
@@ -347,10 +372,7 @@ export default function GuarantorDetailsTest({
               {editingId ? "Edit Guarantor" : "Add Guarantor"}
             </DialogTitle>
           </DialogHeader>
-          <form
-            onSubmit={!!editingId ? editPerson : addPerson}
-            className="space-y-4"
-          >
+          <form className="space-y-4">
             <div>
               <div className="form-section-content-container-single py-0">
                 <h1 className="form-section-title">Guarantor Details</h1>
@@ -620,7 +642,7 @@ export default function GuarantorDetailsTest({
                       </Label>
                       <Select
                         id="pan_registration_district"
-                        value={guarantorDetails.pan_registration_district} 
+                        value={guarantorDetails.pan_registration_district}
                         onValueChange={(value) =>
                           handleChange({
                             target: { id: "pan_registration_district", value },
@@ -732,30 +754,72 @@ export default function GuarantorDetailsTest({
                   <div className="form-section-content-container">
                     <div className="form-section-content">
                       <Label htmlFor="province">Province</Label>
-                      <Input
+                      <Select
                         id="province"
                         value={guarantorDetails.province}
-                        onChange={handleChange}
-                        placeholder="Enter grandfather's name"
-                      />
-                      {errors.province && (
+                        onValueChange={(value) => {
+                          handleChange({
+                            target: {
+                              id: "province",
+                              value,
+                            },
+                          });
+                          if (onProvinceChange) {
+                            onProvinceChange(value);
+                          }
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Province" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {provinceData.map((province) => (
+                            <SelectItem
+                              key={province.province}
+                              value={province.province}
+                            >
+                              {province.province}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {errors.citizenship_issued_district && (
                         <p className="text-red-600 text-sm">
-                          {errors.province}
+                          {errors.citizenship_issued_district}
                         </p>
                       )}
                     </div>
 
                     <div className="form-section-content">
                       <Label htmlFor="district">District</Label>
-                      <Input
+                      <Select
                         id="district"
                         value={guarantorDetails.district}
-                        onChange={handleChange}
-                        placeholder="Enter father's name"
-                      />
-                      {errors.district && (
+                        disabled={!activeProvince}
+                        onValueChange={(value) => {
+                          handleChange({
+                            target: { id: "district", value },
+                          });
+                          if (onDistrictChange) onDistrictChange(value);
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your district" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableDistricts.map((district) => (
+                            <SelectItem
+                              key={district.name}
+                              value={district.name}
+                            >
+                              {district.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {errors.pan_registration_district && (
                         <p className="text-red-600 text-sm">
-                          {errors.district}
+                          {errors.pan_registration_district.message}
                         </p>
                       )}
                     </div>
@@ -764,15 +828,33 @@ export default function GuarantorDetailsTest({
                       <Label htmlFor="vdc__municipality">
                         VDC/Municipality
                       </Label>
-                      <Input
+                      <Select
                         id="vdc__municipality"
                         value={guarantorDetails.vdc__municipality}
-                        onChange={handleChange}
-                        placeholder="Enter mother's name"
-                      />
+                        disabled={!activeDistrict}
+                        onValueChange={(value) => {
+                          handleChange({
+                            target: { id: "vdc__municipality", value },
+                          });
+                          if (onMunicipalityChange) {
+                            onMunicipalityChange(value);
+                          }
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your municipality" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableMunicipalities.map((municipality) => (
+                            <SelectItem key={municipality} value={municipality}>
+                              {municipality}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       {errors.vdc__municipality && (
                         <p className="text-red-600 text-sm">
-                          {errors.vdc__municipality}
+                          {errors.vdc__municipality.message}
                         </p>
                       )}
                     </div>
@@ -783,7 +865,7 @@ export default function GuarantorDetailsTest({
                         id="ward_no"
                         value={guarantorDetails.ward_no}
                         onChange={handleChange}
-                        placeholder="Enter spouse's name (if applicable)"
+                        placeholder="Enter Ward No."
                       />
                       {errors.ward_no && (
                         <p className="text-red-600 text-sm">{errors.ward_no}</p>
@@ -798,7 +880,12 @@ export default function GuarantorDetailsTest({
               <Button type="button" variant="outline" onClick={handleClose}>
                 Cancel
               </Button>
-              <Button type="submit">{editingId ? "Update" : "Submit"}</Button>
+              <Button
+                type="button"
+                onClick={!!editingId ? editPerson : addPerson}
+              >
+                {editingId ? "Update" : "Submit"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>

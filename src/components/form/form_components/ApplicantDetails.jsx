@@ -878,7 +878,6 @@ const ApplicantDetails = ({
                       <Select
                         onValueChange={(value) => {
                           field.onChange(value);
-                          // handleDistrictChange(value);
                           handleMunicipalityChange(value);
                         }}
                         value={field.value}

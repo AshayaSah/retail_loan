@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form"; // Import useForm
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +17,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Edit2, PlusCircle, Trash2 } from "lucide-react";
+import { PlusCircle, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -28,59 +27,39 @@ export function FacilityDetails({
   stepper,
   handleStepper,
 }) {
-  const [facilities, setFacilities] = useState(retailLoanData.table_lfoa || []);
+  const [facilities, setFacilities] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
-
-  // Initialize useForm
-  const {
-    data,
-    register,
-    handleSubmit,
-    reset,
-    setValue: setFormValue,
-  } = useForm({
-    defaultValues: {
-      facility_type: "Housing Loan",
-      tenure_in_months: "12",
-      proposal_limit: "1200000000",
-      purpose: "Financial Funding",
-    },
+  const [facilityDetails, setFacilityDetails] = useState({
+    facility_type: "Housing Loan",
+    tenure_in_months: "",
+    proposal_limit: "",
+    purpose: "",
   });
 
-  const [editingId, setEditingId] = useState(null);
+  const addFacility = (e) => {
+    e.preventDefault();
+    const newFacility = { ...facilityDetails, id: Date.now() };
+    setFacilities([...facilities, newFacility]);
 
-  // Update parent form whenever facilities change
-  useEffect(() => {
-    setValue("table_lfoa", facilities);
-  }, [facilities, setValue]);
-
-  const addOrUpdateFacility = (data) => {
-    let updatedFacilities;
-    if (editingId) {
-      updatedFacilities = facilities.map((facility) =>
-        facility.id === editingId ? { ...data, id: editingId } : facility
-      );
+    if (!retailLoanData.table_lfoa) {
+      setValue("table_lfoa", [newFacility]);
     } else {
-      updatedFacilities = [...facilities, { ...data, id: Date.now() }];
+      const updatedFacilities = [...retailLoanData.table_lfoa, newFacility];
+      setValue("table_lfoa", updatedFacilities);
     }
 
-    setFacilities(updatedFacilities);
-    reset();
+    setFacilityDetails({
+      facility_type: "",
+      tenure_in_months: "",
+      proposal_limit: "",
+      purpose: "",
+    });
     setIsFormOpen(false);
-    setEditingId(null);
   };
 
-  const editFacility = (e, id) => {
-    e.preventDefault();
-    const facilityToEdit = facilities.find((facility) => facility.id === id);
-    if (facilityToEdit) {
-      
-      Object.entries(facilityToEdit).forEach(([key, value]) => {
-        setFormValue(key, value);
-      });
-      setEditingId(id);
-      setIsFormOpen(true);
-    }
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFacilityDetails((prev) => ({ ...prev, [id]: value }));
   };
 
   const deleteFacility = (id) => {
@@ -105,7 +84,7 @@ export function FacilityDetails({
             <TableHead>Facility Type</TableHead>
             <TableHead>Tenure (Months)</TableHead>
             <TableHead>Proposal Limit</TableHead>
-            <TableHead>Purpose</TableHead>
+            <TableCell>Purpose</TableCell>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -116,14 +95,7 @@ export function FacilityDetails({
               <TableCell>{facility.tenure_in_months}</TableCell>
               <TableCell>{facility.proposal_limit}</TableCell>
               <TableCell>{facility.purpose}</TableCell>
-              <TableCell className="flex gap-3">
-                <Button
-                  variant="ghost"
-                  onClick={(e) => editFacility(e, facility.id)}
-                  className="p-1 hover:bg-blue-100"
-                >
-                  <Edit2 className="h-4 w-4 text-blue-500" />
-                </Button>
+              <TableCell>
                 <Button
                   variant="ghost"
                   onClick={() => deleteFacility(facility.id)}
@@ -142,7 +114,7 @@ export function FacilityDetails({
           <DialogHeader>
             <DialogTitle id="dialog-title">Add Facility</DialogTitle>
           </DialogHeader>
-          <form className="space-y-4">
+          <form onSubmit={addFacility} className="space-y-4">
             <h1 className="form-section-title">Facility Details</h1>
 
             <div className="form-section-content-container-three">
@@ -150,7 +122,8 @@ export function FacilityDetails({
                 <Label htmlFor="facility_type">Facility Type</Label>
                 <Input
                   id="facility_type"
-                  {...register("facility_type")} // Register input
+                  value={facilityDetails.facility_type}
+                  onChange={handleChange}
                   placeholder="Enter facility type"
                   className="w-full h-10 p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -160,7 +133,8 @@ export function FacilityDetails({
                 <Label htmlFor="tenure_in_months">Tenure (In Months)</Label>
                 <Input
                   id="tenure_in_months"
-                  {...register("tenure_in_months", {})} // Register input
+                  value={facilityDetails.tenure_in_months}
+                  onChange={handleChange}
                   placeholder="Enter tenure in months"
                   className="w-full h-10 p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -170,7 +144,8 @@ export function FacilityDetails({
                 <Label htmlFor="proposal_limit">Loan Amount</Label>
                 <Input
                   id="proposal_limit"
-                  {...register("proposal_limit")} // Register input
+                  value={facilityDetails.proposal_limit}
+                  onChange={handleChange}
                   placeholder="Enter proposal limit"
                   className="w-full h-10 p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -180,7 +155,8 @@ export function FacilityDetails({
                 <Label htmlFor="purpose">Purpose</Label>
                 <Textarea
                   id="purpose"
-                  {...register("purpose")} // Register input
+                  value={facilityDetails.purpose}
+                  onChange={handleChange}
                   placeholder="Enter purpose"
                   className="w-full h-24 p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -195,10 +171,7 @@ export function FacilityDetails({
               >
                 Cancel
               </Button>
-              <Button type="button"
-               onClick={handleSubmit(addOrUpdateFacility)}>
-               {editingId ? "Update" : "Submit"} 
-              </Button>
+              <Button type="submit">Submit</Button>
             </DialogFooter>
           </form>
         </DialogContent>
