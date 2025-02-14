@@ -1,8 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* @layer base {
+/* 
+@layer base {
   :root {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
@@ -75,9 +75,6 @@
   }
 } */
 
-
-
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -135,8 +132,6 @@
   }
 }
 
-
-
 @layer base {
   * {
     @apply border-border;
@@ -147,8 +142,8 @@
 }
 
 @layer components {
-  .form-section{
-    @apply w-[90%] mx-auto mb-6 p-4 shadow-lg rounded-lg ;
+  .form-section {
+    @apply w-[90%] mx-auto mb-6 p-4 shadow-lg rounded-lg;
   }
 
   /* .form-section-content-container {
@@ -179,37 +174,35 @@
   .form-section-title {
     @apply text-2xl font-bold pt-2 text-primary tracking-wide relative pb-2 border-b border-muted transition-all ease-in-out duration-500;
   }
-  
+
   .form-section-title::after {
     @apply content-[''] block w-24 h-[3px] bg-primary rounded-full absolute bottom-0 left-0 transform scale-x-0 origin-left transition-all ease-in-out duration-500;
   }
-  
+
   /* .form-section-title:hover::after {
     @apply scale-x-100;
   } */
-   
 
-  
-/* Form section containers */
-.form-section-content-container {
-  @apply grid md:grid-cols-2 sm:grid-cols-1 gap-x-3 gap-y-2 py-3 rounded-b-[1rem];
-}
+  /* Form section containers */
+  .form-section-content-container {
+    @apply grid md:grid-cols-2 sm:grid-cols-1 gap-x-3 gap-y-2 py-3 rounded-b-[1rem];
+  }
 
-.form-section-content-container-single {
-  @apply grid sm:grid-cols-1 gap-y-2 py-3 rounded-b-[1rem];
-}
+  .form-section-content-container-single {
+    @apply grid sm:grid-cols-1 gap-y-2 py-3 rounded-b-[1rem];
+  }
 
-.form-section-content-container-three {
-  @apply grid md:grid-cols-3 sm:grid-cols-1 gap-y-2 py-3 rounded-b-[1rem];
-}
+  .form-section-content-container-three {
+    @apply grid md:grid-cols-3 sm:grid-cols-1 gap-y-2 py-3 rounded-b-[1rem];
+  }
 
-/* Form content with subtle animation */
-.form-section-content {
-  @apply flex flex-col gap-1 px-3 py-2 bg-white transform translate-y-4 transition-all duration-500 ease-in-out;
-  animation: slideIn 0.8s ease-in-out forwards;
-}
+  /* Form content with subtle animation */
+  .form-section-content {
+    @apply flex flex-col gap-1 px-3 py-2 bg-white transform translate-y-4 transition-all duration-500 ease-in-out;
+    animation: slideIn 0.8s ease-in-out forwards;
+  }
 
-/* .form-section-content:nth-child(odd) {
+  /* .form-section-content:nth-child(odd) {
   animation-delay: 0.2s;
 }
 
@@ -217,107 +210,101 @@
   animation-delay: 0.4s;
 }  */
 
-/* Animation for smooth slide-in from the right */
-@keyframes slideIn {
-  0% {
-    transform: translateX(50px);
+  /* Animation for smooth slide-in from the right */
+  @keyframes slideIn {
+    0% {
+      transform: translateX(50px);
+    }
+    100% {
+      transform: translateX(0);
+    }
   }
-  100% {
-    transform: translateX(0);
+
+  .custom-toast {
+    @apply min-w-[450px] p-8 text-lg leading-[1.6] bg-background;
   }
-}
-
-/* Labels */
-.form-section-content label {
-  @apply text-base font-medium text-primary;
-}
-
-/* Inputs, Selects, and Textareas */
-.form-section-content input,
-.form-section-content select,
-.form-section-content textarea {
-  @apply mt-1 p-2 rounded-md border border-muted focus:ring-2 focus:ring-primary focus:outline-none transition-all duration-200 ease-in-out;
-}
-
-.form-section-content input:focus,
-.form-section-content select:focus,
-.form-section-content textarea:focus {
-  @apply border-primary;
-}
-
-.form-section-content input:hover,
-.form-section-content select:hover,
-.form-section-content textarea:hover {
-  @apply ring-2 ring-primary/30;
-}
-
-/* Error messages */
-.form-section-content .error-message {
-  @apply text-sm text-red-600;
-}
-
-/* Checkbox Container (ShadCN Checkbox) */
-.checkbox-container {
-  @apply flex items-center space-x-2 transform translate-y-2 transition-all duration-500 ease-in-out;
-  animation: slideUp 0.5s forwards;
-}
-
-.checkbox-container label {
-  @apply text-base font-medium text-primary cursor-pointer transition-all duration-200;
-}
-
-.checkbox-container .shadcn-checkbox {
-  @apply transition-all duration-200 ease-in-out border-muted rounded-md focus:ring-primary focus:ring-2 hover:ring-primary/30;
-}
-
-/* Animation for checkbox sliding up */
-@keyframes slideUp {
-  0% {
-    transform: translateY(10px);
+  /* Labels */
+  .form-section-content label {
+    @apply text-base font-medium text-primary;
   }
-  100% {
-    transform: translateY(0);
+
+  /* Inputs, Selects, and Textareas */
+  .form-section-content input,
+  .form-section-content select,
+  .form-section-content textarea {
+    @apply mt-1 p-2 rounded-md border border-muted focus:ring-2 focus:ring-primary focus:outline-none transition-all duration-200 ease-in-out;
   }
-}
 
+  .form-section-content input:focus,
+  .form-section-content select:focus,
+  .form-section-content textarea:focus {
+    @apply border-primary;
+  }
 
+  .form-section-content input:hover,
+  .form-section-content select:hover,
+  .form-section-content textarea:hover {
+    @apply ring-2 ring-primary/30;
+  }
 
+  /* Error messages */
+  .form-section-content .error-message {
+    @apply text-sm text-red-600;
+  }
 
+  /* Checkbox Container (ShadCN Checkbox) */
+  .checkbox-container {
+    @apply flex items-center space-x-2 transform translate-y-2 transition-all duration-500 ease-in-out;
+    animation: slideUp 0.5s forwards;
+  }
 
-/* Fancy Scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
+  .checkbox-container label {
+    @apply text-base font-medium text-primary cursor-pointer transition-all duration-200;
+  }
 
-/* Scrollbar Track */
-::-webkit-scrollbar-track {
-  @apply bg-muted/40 rounded-lg;
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
-}
+  .checkbox-container .shadcn-checkbox {
+    @apply transition-all duration-200 ease-in-out border-muted rounded-md focus:ring-primary focus:ring-2 hover:ring-primary/30;
+  }
 
-/* Scrollbar Thumb */
-::-webkit-scrollbar-thumb {
-  @apply bg-gradient-to-br from-primary via-primary/80 to-primary/50 rounded-full;
-  border: 2px solid theme("colors.background");
-  transition: all 0.3s ease-in-out;
-}
+  /* Animation for checkbox sliding up */
+  @keyframes slideUp {
+    0% {
+      transform: translateY(10px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
 
-/* Scrollbar Thumb (Hover Effect) */
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-gradient-to-br from-primary/90 via-primary to-primary/70;
-  border-color: theme("colors.primary");
-  transform: scale(1.1);
-}
+  /* Fancy Scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
 
-/* Firefox Support */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: theme("colors.primary") theme("colors.muted/40");
-}
+  /* Scrollbar Track */
+  ::-webkit-scrollbar-track {
+    @apply bg-muted/40 rounded-lg;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+  }
 
+  /* Scrollbar Thumb */
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gradient-to-br from-primary via-primary/80 to-primary/50 rounded-full;
+    border: 2px solid theme("colors.background");
+    transition: all 0.3s ease-in-out;
+  }
 
+  /* Scrollbar Thumb (Hover Effect) */
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gradient-to-br from-primary/90 via-primary to-primary/70;
+    border-color: theme("colors.primary");
+    transform: scale(1.1);
+  }
 
- 
-  
+  /* Firefox Support */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: theme("colors.primary") theme("colors.muted/40");
+  }
 }

@@ -23,6 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Edit2, PlusCircle, Search, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -42,6 +43,7 @@ export default function GuarantorDetailsTest({
   const [editingId, setEditingId] = useState(null);
   const [currentDate, setCurrentDate] = useState("");
   const [citizenshipMinDate, setCitizenshipMinDate] = useState("");
+  const [isFormComplete, setIsFormComplete] = useState(false);
 
   const [guarantorDetails, setGuarantorDetails] = useState({
     is_existing_customer: "",
@@ -108,7 +110,7 @@ export default function GuarantorDetailsTest({
           pan_number: "987654321",
           pan_registration_date: "2015-06-12",
           pan_registration_district: "Kathmandu",
-          province: "Bagmati Province",
+          // province: "Bagmati Province",
           district: "Kathmandu",
           vdc__municipality: "Kathmandu",
           ward_no: "10",
@@ -234,26 +236,7 @@ export default function GuarantorDetailsTest({
       person.guarantor_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       person.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  useEffect(() => {
-    // This will run when the date_of_birth changes
-    const calculateMinCitizenshipDate = () => {
-      const dob = retailLoanData.date_of_birth;
-      const today = new Date(dob);
-
-      if (!dob || isNaN(today.getTime())) return;
-
-      // Add 16 years to the birthdate
-      const minEligibleDate = new Date(today);
-      minEligibleDate.setFullYear(today.getFullYear() + 16);
-
-      // Format the date to YYYY-MM-DD and set it as the minimum allowed date for citizenship issuance
-      setCitizenshipMinDate(minEligibleDate.toISOString().split("T")[0]);
-    };
-
-    calculateMinCitizenshipDate();
-  }, [guarantorDetails.date_of_birth]);
-
+  
   const calculateAge = (dob) => {
     if (!dob) return "";
     const birthDate = new Date(dob);
@@ -298,6 +281,31 @@ export default function GuarantorDetailsTest({
     clearForm();
     setIsFormOpen(false);
   };
+
+  useEffect(() => {
+    // This will run when the date_of_birth changes
+    const calculateMinCitizenshipDate = () => {
+      const dob = retailLoanData.date_of_birth;
+      const today = new Date(dob);
+
+      if (!dob || isNaN(today.getTime())) return;
+
+      // Add 16 years to the birthdate
+      const minEligibleDate = new Date(today);
+      minEligibleDate.setFullYear(today.getFullYear() + 16);
+
+      // Format the date to YYYY-MM-DD and set it as the minimum allowed date for citizenship issuance
+      setCitizenshipMinDate(minEligibleDate.toISOString().split("T")[0]);
+    };
+
+    calculateMinCitizenshipDate();
+  }, [guarantorDetails.date_of_birth]);
+
+  useEffect(() => {
+    const hasErrors = Object.keys(errors).length > 0;
+    setIsFormComplete(!hasErrors && guarantors.length > 0); // Ensure at least one security is added
+  }, [errors, guarantors]);
+
 
   return (
     <Card className="form-section shadow-lg">
@@ -347,7 +355,7 @@ export default function GuarantorDetailsTest({
                 <Button
                   variant="ghost"
                   onClick={(e) => handleEdit(e, person.id)}
-                  className="p-1 hover:bg-blue-100"
+                  className="p-2 hover:bg-blue-100"
                 >
                   <Edit2 className="h-4 w-4 text-blue-500" />
                 </Button>
@@ -355,7 +363,8 @@ export default function GuarantorDetailsTest({
                   variant="ghost"
                   type="button"
                   onClick={() => deletePerson(person.id)}
-                  className="flex items-center justify-center p-2 bg-gray-200 text-red-500 rounded-lg shadow-md transition-transform transform hover:scale-105 hover:bg-red-100"
+                  //  className="p-1 hover:scale-105 hover:bg-red-100"
+                  className="flex items-center justify-center p-2 text-red-500 rounded-lg transition-transform transform hover:scale-105 hover:bg-red-100"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -368,9 +377,10 @@ export default function GuarantorDetailsTest({
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="max-w-[80%] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle id="dialog-title">
-              {editingId ? "Edit Guarantor" : "Add Guarantor"}
-            </DialogTitle>
+            <DialogTitle id="dialog-title">Add Guarantor</DialogTitle>
+            <DialogDescription className="hidden">
+              Please fill in the guarantor details below.
+            </DialogDescription>
           </DialogHeader>
           <form className="space-y-4">
             <div>
@@ -893,7 +903,11 @@ export default function GuarantorDetailsTest({
       <div className="">
         {!stepper[1].state && (
           <div className="form-next-button">
-            <Button type="submit" onClick={() => handleStepper(1)}>
+            <Button
+              type="submit"
+              onClick={() => handleStepper(1)}
+              disabled={!isFormComplete}
+            >
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             </Button>
           </div>

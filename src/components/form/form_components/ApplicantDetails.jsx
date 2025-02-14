@@ -34,6 +34,8 @@ const ApplicantDetails = ({
   const [sameAddress, setSameAddress] = useState(false);
   const [currentDate, setCurrentDate] = useState("");
   const [citizenshipMinDate, setCitizenshipMinDate] = useState("");
+  const [isFormComplete, setIsFormComplete] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
   useEffect(() => {
     if (sameAddress) {
@@ -68,13 +70,29 @@ const ApplicantDetails = ({
       // Add 16 years to the birthdate
       const minEligibleDate = new Date(today);
       minEligibleDate.setFullYear(today.getFullYear() + 16);
-
-      // Format the date to YYYY-MM-DD and set it as the minimum allowed date for citizenship issuance
       setCitizenshipMinDate(minEligibleDate.toISOString().split("T")[0]);
     };
 
     calculateMinCitizenshipDate();
   }, [retailLoanData.date_of_birth]);
+
+  useEffect(() => {
+    // Check if all required fields are filled and valid
+    const hasErrors = Object.keys(errors).length > 0;
+    const requiredFieldsFilled =
+      retailLoanData.custom_customer_name &&
+      retailLoanData.expected_loan_amount &&
+      retailLoanData.account_number &&
+      retailLoanData.date_of_birth &&
+      retailLoanData.gender &&
+      retailLoanData.marital_status &&
+      retailLoanData.nationality &&
+      retailLoanData.citizenship_number &&
+      retailLoanData.citizenship_issued_date &&
+      retailLoanData.citizenship_issued_district;
+
+    setIsFormComplete(!hasErrors && requiredFieldsFilled);
+  }, [errors, retailLoanData]);
 
   const { toast } = useToast();
 
@@ -93,6 +111,26 @@ const ApplicantDetails = ({
     }
 
     return age;
+  };
+
+  const handleFetchData = async () => {
+    setIsFetching(true);
+    try {
+      await handleFetch();
+      toast({
+        title: "Successfully Fetched",
+        duration: 1000,
+      });
+    } catch (error) {
+      console.error("Fetch error:", error);
+      toast({
+        title: "Fetch Failed",
+        description: "There was an error fetching the data.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsFetching(false);
+    }
   };
 
   const handleAgeCalculation = (event) => {
@@ -178,7 +216,7 @@ const ApplicantDetails = ({
   };
 
   return (
-    <Card className="form-section shadow-lg mt-8">
+    <Card className="form-section shadow-lg mt-6">
       {/* Check the Existing Customer Section */}
       <div className="form-section-content-container-single py-0">
         <h1 className="form-section-title">Applicant Details</h1>
@@ -301,15 +339,10 @@ const ApplicantDetails = ({
               <Label>&nbsp;</Label>
               <Button
                 type="button"
-                onClick={() => {
-                  toast({
-                    title: "Scheduled: Catch up",
-                    description: "Friday, February 10, 2023 at 5:57 PM",
-                  });
-                  handleFetch();
-                }}
+                onClick={handleFetchData} // Call the new fetch function
+                disabled={isFetching}
               >
-                Fetch Data
+                {!isFetching ? "Fetched" : "Fetch Data"}
               </Button>
             </div>
           </div>
@@ -934,7 +967,7 @@ const ApplicantDetails = ({
                   </Label>
                 </div>
               </div>
-              
+
               {/* Current Address */}
               <h1 className="form-section-title">Current Address</h1>
               <div className="form-section-content-container pb-0">
@@ -1327,7 +1360,11 @@ const ApplicantDetails = ({
         {!stepper[0].state &&
           retailLoanData.custom_client_type === "Existing" && (
             <div className="form-next-button">
-              <Button type="button" onClick={() => handleStepper(0)}>
+              <Button
+                type="button"
+                onClick={() => handleStepper(0)}
+                disabled={!isFormComplete}
+              >
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               </Button>
             </div>

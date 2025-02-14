@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import React, { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form"; // Import useForm
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Table,
   TableBody,
@@ -24,9 +26,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { Edit2, PlusCircle, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import { districtsNepali } from "../provincedetails";
 
 export function SecurityDetails({
@@ -34,24 +38,64 @@ export function SecurityDetails({
   setValue,
   stepper,
   handleStepper,
-  handleSelectChange,
 }) {
-  const [securities, setSecurities] = useState([]);
+  const [securities, setSecurities] = useState(retailLoanData.table_drge || []);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [editingId, setEditingId] = useState(null);
+  const [isFormComplete, setIsFormComplete] = useState(false);
+
+  const securitySchema = z.object({
+    // Required fields
+    property: z.string().min(1, "Property selection is required"),
+    name_of_owner: z.string().min(1, "Owner name is required"),
+    area: z.coerce.number().positive("Area must be a positive number"),
+    location_of_property: z.string().min(1, "Location is required"),
+    province: z.string().min(1, "Province is required"),
+    district: z.string().min(1, "District is required"),
+
+    // Optional fields
+    vdcmunicipality: z.string().optional().or(z.literal("")),
+    ward_no: z.coerce.number().nonnegative().optional(),
+    placestreet_name: z.string().optional().or(z.literal("")),
+    plot_no: z.string().optional().or(z.literal("")),
+    land_revenue_office: z.string().optional().or(z.literal("")),
+    shape_of_land: z.string().optional().or(z.literal("")),
+    motorable_road_access: z.string().optional().or(z.literal("")),
+    road_width: z.string().optional().or(z.literal("")),
+    road_access_from: z.string().optional().or(z.literal("")),
+    road_setbacks: z.string().optional().or(z.literal("")),
+    river_setbacks: z.string().optional().or(z.literal("")),
+    high_tension_setbacks: z.string().optional().or(z.literal("")),
+
+    // Contact info (optional with validation)
+    email: z
+      .string()
+      .email("Invalid email address")
+      .optional()
+      .or(z.literal("")),
+    phone: z
+      .string()
+      .regex(/^[0-9]{10}$/, "Invalid phone number (10 digits)")
+      .optional()
+      .or(z.literal("")),
+  });
 
   // Initialize useForm
   const {
+    data,
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
+    setValue: setFormValue,
   } = useForm({
+    resolver: zodResolver(securitySchema),
     defaultValues: {
       name_of_owner: "",
       email: "",
       phone: "",
-      property: "",
+      property: "Land",
       area: "",
       location_of_property: "",
       province: "",
@@ -72,36 +116,48 @@ export function SecurityDetails({
   });
 
   useEffect(() => {
-    console.log("Securities Data: ", securities);
-  }, [securities]);
+    setValue("table_drge", securities);
+    // console.debug("Frappe", table_drge)
+  }, [securities, setValue]);
 
-  const addPerson = (data) => {
-    const newPerson = { ...data, id: Date.now() };
-    setSecurities((prev) => [...prev, newPerson]);
-
-    if (!retailLoanData.table_drge) {
-      setValue("table_drge", [newPerson]);
+  useEffect(() => {
+    const hasErrors = Object.keys(errors).length > 0;
+    setIsFormComplete(!hasErrors && securities.length > 0); // Ensure at least one security is added
+  }, [errors, securities]);
+  const addOrUpdateFacility = (data) => {
+    let updatedSecurities;
+    if (editingId) {
+      updatedSecurities = securities.map((security) =>
+        security.id === editingId ? { ...data, id: editingId } : security
+      );
     } else {
-      const updatedGuarantors = [...retailLoanData.table_drge, newPerson];
-      setValue("table_drge", updatedGuarantors);
+      updatedSecurities = [...securities, { ...data, id: Date.now() }];
     }
 
-    // Clear form data and close the form after adding
+    setSecurities(updatedSecurities);
     reset();
     setIsFormOpen(false);
+    setEditingId(null);
   };
 
-  const deletePerson = (id) => {
-    const updatedPeople = securities.filter((person) => person.id !== id);
-    setSecurities(updatedPeople);
-    setValue("securities", updatedPeople);
+  const editSecurity = (e, id) => {
+    e.preventDefault();
+    const securitiesToEdit = securities.find((security) => security.id === id);
+    if (securitiesToEdit) {
+      Object.entries(securitiesToEdit).forEach(([key, value]) => {
+        setFormValue(key, value);
+      });
+      setEditingId(id);
+      setIsFormOpen(true);
+    }
   };
 
-  const filteredPeople = securities.filter(
-    (person) =>
-      person.name_of_owner.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      person.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const deleteSecurity = (id) => {
+    const updatedSecurities = securities.filter(
+      (security) => security.id !== id
+    );
+    setSecurities(updatedSecurities);
+  };
 
   return (
     <Card className="form-section shadow-lg">
@@ -124,18 +180,25 @@ export function SecurityDetails({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredPeople.map((person) => (
-            <TableRow key={person.id}>
-              <TableCell>{person.name_of_owner}</TableCell>
-              <TableCell>{person.district}</TableCell>
-              <TableCell>{person.area}</TableCell>
-              <TableCell>{person.location_of_property}</TableCell>
-              <TableCell>{person.plot_no}</TableCell>
-              <TableCell className="pl-5">
+          {securities.map((security) => (
+            <TableRow key={security.id}>
+              <TableCell>{security.name_of_owner}</TableCell>
+              <TableCell>{security.district}</TableCell>
+              <TableCell>{security.area}</TableCell>
+              <TableCell>{security.location_of_property}</TableCell>
+              <TableCell>{security.plot_no}</TableCell>
+              <TableCell className="flex gap-3">
                 <Button
                   variant="ghost"
-                  onClick={() => deletePerson(person.id)}
-                  className="p-1 hover:bg-red-100"
+                  onClick={(e) => editSecurity(e, security.id)}
+                  className="p-2 hover:bg-blue-100"
+                >
+                  <Edit2 className="h-4 w-4 text-blue-500" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => deleteSecurity(security.id)}
+                  className="p-2 hover:bg-red-100"
                 >
                   <Trash2 className="h-4 w-4 text-red-500" />
                 </Button>
@@ -149,34 +212,34 @@ export function SecurityDetails({
         <DialogContent className="max-w-[80%] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add Realstate Security</DialogTitle>
+            <DialogDescription className="hidden">
+              Please fill in the Security details below.
+            </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit(addPerson)} className="space-y-4">
-            <h1 className="form-section-title">Property Details</h1>
 
-            <div className="grid grid-cols-3 gap-4">
+          <form className="space-y-4">
+            <h1 className="form-section-title">Property Details</h1>
+            <div className="form-section-content-container-three">
+              {/* Property */}
               <div className="form-section-content">
-                <Label htmlFor="property">
-                  Property <span className="text-red-600">*</span>
-                </Label>
-                <Select
-                  id="property"
-                  {...register("property", {
-                    required: "Property is required.",
-                  })} // Register input with validation
-                  onValueChange={(value) => {
-                    setValue("property", value);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Land">Land</SelectItem>
-                    <SelectItem value="Land and Building">
-                      Land and Building
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="property">Property</Label>
+                <Controller
+                  name="property"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Land">Land</SelectItem>
+                        <SelectItem value="Land and Building">
+                          Land and Building
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
                 {errors.property && (
                   <p className="text-red-600 text-sm">
                     {errors.property.message}
@@ -202,6 +265,8 @@ export function SecurityDetails({
                 <Label htmlFor="area">Area (Sq.mt)</Label>
                 <Input
                   id="area"
+                  type="number"
+                  min="0"
                   {...register("area")} // Register input with validation
                   placeholder="Enter area in square meters"
                 />
@@ -210,30 +275,33 @@ export function SecurityDetails({
                 )}
               </div>
 
+              {/* Location of Property */}
               <div className="form-section-content">
-                <Label htmlFor="location_of_property">
-                  Location <span className="text-red-600">*</span>
-                </Label>
-                <Select
-                  id="location_of_property"
-                  {...register("location_of_property")} // Register input with validation
-                  onValueChange={(value) => {
-                    setValue("location_of_property", value);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Enter location" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="NA">NA</SelectItem>
-                    <SelectItem value="Metropolitan">Metropolitan</SelectItem>
-                    <SelectItem value="Sub-Metropolitan">
-                      Sub-Metropolitan
-                    </SelectItem>
-                    <SelectItem value="Municipality">Municipality</SelectItem>
-                    <SelectItem value="Village">Village</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="location_of_property">Location</Label>
+                <Controller
+                  name="location_of_property"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Enter location" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="NA">NA</SelectItem>
+                        <SelectItem value="Metropolitan">
+                          Metropolitan
+                        </SelectItem>
+                        <SelectItem value="Sub-Metropolitan">
+                          Sub-Metropolitan
+                        </SelectItem>
+                        <SelectItem value="Municipality">
+                          Municipality
+                        </SelectItem>
+                        <SelectItem value="Village">Village</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
                 {errors.location_of_property && (
                   <p className="text-red-600 text-sm">
                     {errors.location_of_property.message}
@@ -325,26 +393,27 @@ export function SecurityDetails({
                 )}
               </div>
 
+              {/* Land Revenue Office */}
               <div className="form-section-content">
                 <Label htmlFor="land_revenue_office">Land Revenue Office</Label>
-                <Select
-                  id="land_revenue_office"
-                  {...register("land_revenue_office")} // Register input with validation
-                  onValueChange={(value) => {
-                    setValue("land_revenue_office", value);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Land Revenue Office" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {districtsNepali.map((district) => (
-                      <SelectItem key={district} value={district}>
-                        {district}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="land_revenue_office"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Land Revenue Office" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {districtsNepali.map((district) => (
+                          <SelectItem key={district} value={district}>
+                            {district}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
                 {errors.land_revenue_office && (
                   <p className="text-red-600 text-sm">
                     {errors.land_revenue_office.message}
@@ -354,29 +423,30 @@ export function SecurityDetails({
             </div>
 
             <h1 className="form-section-title mt-6">Description of the Land</h1>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="form-section-content-container-three">
+              {/* Shape of Land */}
               <div className="form-section-content">
                 <Label htmlFor="shape_of_land">Shape of Land</Label>
-                <Select
-                  id="shape_of_land"
-                  {...register("shape_of_land")} // Register input with validation
-                  onValueChange={(value) => {
-                    setValue("shape_of_land", value);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Enter shape of land" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Square">Square</SelectItem>
-                    <SelectItem value="Rectangular">Rectangular</SelectItem>
-                    <SelectItem value="Triangular">Triangular</SelectItem>
-                    <SelectItem value="Irregular">Irregular</SelectItem>
-                    <SelectItem value="Vertical slope">
-                      Vertical slope
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="shape_of_land"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Enter shape of land" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Square">Square</SelectItem>
+                        <SelectItem value="Rectangular">Rectangular</SelectItem>
+                        <SelectItem value="Triangular">Triangular</SelectItem>
+                        <SelectItem value="Irregular">Irregular</SelectItem>
+                        <SelectItem value="Vertical slope">
+                          Vertical slope
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
                 {errors.shape_of_land && (
                   <p className="text-red-600 text-sm">
                     {errors.shape_of_land.message}
@@ -384,25 +454,26 @@ export function SecurityDetails({
                 )}
               </div>
 
+              {/* Motorable Road Access */}
               <div className="form-section-content">
                 <Label htmlFor="motorable_road_access">
                   Motorable Road Access
                 </Label>
-                <Select
-                  id="motorable_road_access"
-                  {...register("motorable_road_access")} // Register input with validation
-                  onValueChange={(value) => {
-                    setValue("motorable_road_access", value);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Yes">Yes</SelectItem>
-                    <SelectItem value="No">No</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="motorable_road_access"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Yes">Yes</SelectItem>
+                        <SelectItem value="No">No</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
                 {errors.motorable_road_access && (
                   <p className="text-red-600 text-sm">
                     {errors.motorable_road_access.message}
@@ -410,37 +481,38 @@ export function SecurityDetails({
                 )}
               </div>
 
+              {/* Road Width */}
               <div className="form-section-content">
                 <Label htmlFor="road_width">Road Width</Label>
-                <Select
-                  id="road_width"
-                  {...register("road_width")} // Register input with validation
-                  onValueChange={(value) => {
-                    setValue("road_width", value);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Enter road width" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="NA">NA</SelectItem>
-                    <SelectItem value="More than 20 feet">
-                      More than 20 feet
-                    </SelectItem>
-                    <SelectItem value="More than 13 feet up to 20 feet">
-                      More than 13 feet up to 20 feet
-                    </SelectItem>
-                    <SelectItem value="More than 10 feet upto 13 feet">
-                      More than 10 feet upto 13 feet
-                    </SelectItem>
-                    <SelectItem value="From 8 feet upto 10 feet">
-                      From 8 feet upto 10 feet
-                    </SelectItem>
-                    <SelectItem value="Less than 8 feet">
-                      Less than 8 feet
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="road_width"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Enter road width" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="NA">NA</SelectItem>
+                        <SelectItem value="More than 20 feet">
+                          More than 20 feet
+                        </SelectItem>
+                        <SelectItem value="More than 13 feet up to 20 feet">
+                          More than 13 feet up to 20 feet
+                        </SelectItem>
+                        <SelectItem value="More than 10 feet upto 13 feet">
+                          More than 10 feet upto 13 feet
+                        </SelectItem>
+                        <SelectItem value="From 8 feet upto 10 feet">
+                          From 8 feet upto 10 feet
+                        </SelectItem>
+                        <SelectItem value="Less than 8 feet">
+                          Less than 8 feet
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
                 {errors.road_width && (
                   <p className="text-red-600 text-sm">
                     {errors.road_width.message}
@@ -448,25 +520,28 @@ export function SecurityDetails({
                 )}
               </div>
 
+              {/* Road Access From */}
               <div className="form-section-content">
                 <Label htmlFor="road_access_from">Road Access From</Label>
-                <Select
-                  id="road_access_from"
-                  {...register("road_access_from")} // Register input with validation
-                  onValueChange={(value) => {
-                    setValue("road_access_from", value);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Enter access point" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="NA">NA</SelectItem>
-                    <SelectItem value="Black Topped">Black Topped</SelectItem>
-                    <SelectItem value="Graveled">Graveled</SelectItem>
-                    <SelectItem value="Earthen">Earthen</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="road_access_from"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Enter access point" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="NA">NA</SelectItem>
+                        <SelectItem value="Black Topped">
+                          Black Topped
+                        </SelectItem>
+                        <SelectItem value="Graveled">Graveled</SelectItem>
+                        <SelectItem value="Earthen">Earthen</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
                 {errors.road_access_from && (
                   <p className="text-red-600 text-sm">
                     {errors.road_access_from.message}
@@ -474,23 +549,24 @@ export function SecurityDetails({
                 )}
               </div>
 
+              {/* Road Setbacks */}
               <div className="form-section-content">
                 <Label htmlFor="road_setbacks">Any Road Setbacks?</Label>
-                <Select
-                  id="road_setbacks"
-                  {...register("road_setbacks")} // Register input with validation
-                  onValueChange={(value) => {
-                    setValue("road_setbacks", value);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="YES">YES</SelectItem>
-                    <SelectItem value="NO">NO</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="road_setbacks"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="YES">YES</SelectItem>
+                        <SelectItem value="NO">NO</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
                 {errors.road_setbacks && (
                   <p className="text-red-600 text-sm">
                     {errors.road_setbacks.message}
@@ -498,25 +574,26 @@ export function SecurityDetails({
                 )}
               </div>
 
+              {/* River Setbacks */}
               <div className="form-section-content">
                 <Label htmlFor="river_setbacks">
                   Any River/Canal Setbacks?
                 </Label>
-                <Select
-                  id="river_setbacks"
-                  {...register("river_setbacks")} // Register input with validation
-                  onValueChange={(value) => {
-                    setValue("river_setbacks", value);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="YES">YES</SelectItem>
-                    <SelectItem value="NO">NO</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="river_setbacks"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="YES">YES</SelectItem>
+                        <SelectItem value="NO">NO</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
                 {errors.river_setbacks && (
                   <p className="text-red-600 text-sm">
                     {errors.river_setbacks.message}
@@ -524,25 +601,26 @@ export function SecurityDetails({
                 )}
               </div>
 
+              {/* High Tension Setbacks */}
               <div className="form-section-content">
                 <Label htmlFor="high_tension_setbacks">
                   Any High Tension Setbacks?
                 </Label>
-                <Select
-                  id="high_tension_setbacks"
-                  {...register("high_tension_setbacks")} // Register input with validation
-                  onValueChange={(value) => {
-                    setValue("high_tension_setbacks", value);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="YES">YES</SelectItem>
-                    <SelectItem value="NO">NO</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="high_tension_setbacks"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="YES">YES</SelectItem>
+                        <SelectItem value="NO">NO</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
                 {errors.high_tension_setbacks && (
                   <p className="text-red-600 text-sm">
                     {errors.high_tension_setbacks.message}
@@ -559,7 +637,9 @@ export function SecurityDetails({
               >
                 Cancel
               </Button>
-              <Button type="submit">Submit</Button>
+              <Button type="button" onClick={handleSubmit(addOrUpdateFacility)}>
+                {editingId ? "Update" : "Submit"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -567,7 +647,11 @@ export function SecurityDetails({
 
       {!stepper[3].state && (
         <div className="form-next-button">
-          <Button type="button" onClick={() => handleStepper(3)}>
+          <Button
+            type="button"
+            onClick={() => handleStepper(3)}
+            disabled={!isFormComplete}
+          >
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           </Button>
         </div>

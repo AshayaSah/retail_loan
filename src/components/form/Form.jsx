@@ -12,11 +12,14 @@ import AppSidebar from "../AppSidebar";
 import Heading from "./form_components/Heading";
 import ApplicantDetails from "./form_components/ApplicantDetails";
 import { GuarantorDetailsTable } from "./form_components/guarantor_details_table/GuarantorDetailsTable";
-import { SecurityDetails } from "./form_components/securityDetails/securityDetailsEx";
+import { SecurityDetails } from "./form_components/securityDetails/securityDetails";
 import { FacilityDetails } from "./form_components/facilityDetails/FacilityDetails";
 import Preview from "./form_components/preview/Preview";
-import GuarantorDetailsTest from "./form_components/guarantor_details_table/GuaranterDetailsTestEx";
+import GuarantorDetailsTest from "./form_components/guarantor_details_table/GuaranterDetailsTest";
 import FancyAlert from "./alert/FancyAlert";
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
+import Prerequisits from "./form_components/Prerequisits";
 
 const Form = () => {
   // Initialize useForm
@@ -42,14 +45,12 @@ const Form = () => {
   } = useAppStore();
 
   const navigate = useNavigate();
-  const [toast, setToast] = useState(null);
-  const [alertMessage, setAlertMessage] = useState("");
   const [tandC, setTandC] = useState(false);
+  const { toast } = useToast();
 
   // Watch all form values at once
   const retailLoanData = useWatch({ control });
 
-  // Log all form values whenever they change
   useEffect(() => {
     console.log("All Form Values:", retailLoanData);
   }, [retailLoanData]);
@@ -89,10 +90,10 @@ const Form = () => {
           offsprings: "2",
           spouse_name: "None",
 
-          province: "Bagmati Province",
-          district: "Lalitpur",
-          vdc_municipality: "Mahalaxmi",
-          ward_no: "10",
+          // province: "Bagmati Province",
+          // district: "Lalitpur",
+          // vdc_municipality: "Mahalaxmi",
+          // ward_no: "10",
         };
 
         Object.keys(fetchData).forEach((key) => setValue(key, fetchData[key]));
@@ -104,18 +105,46 @@ const Form = () => {
     }
   };
 
-  // Form submission handler
-  const onSubmit = () => {
-    // e.preventDefault();
-    console.log("Form Submitted:", retailLoanData);
-    setIsSubmitted(true);
-    setAlertMessage(
-      "Your form has been submitted successfully!\nWait for your form to be Reviewed."
-    );
-    adddPersonalInfo(retailLoanData);
-    // setIsSubmitted(false)
-  };
+  // // Form submission handler
+  // const onSubmit = () => {
+  //   // e.preventDefault();
+  //   console.log("Form Submitted:", retailLoanData);
+  //   setIsSubmitted(true);
+  //   setAlertMessage(
+  //     "Your form has been submitted successfully!\nWait for your form to be Reviewed."
+  //   );
+  //   adddPersonalInfo(retailLoanData);
+  //   // setIsSubmitted(false)
+  // };
 
+  const onSubmit = async () => {
+    console.log("Form Submitted:", retailLoanData);
+    try {
+      setIsSubmitted(true);
+      await adddPersonalInfo(retailLoanData);
+      toast({
+        title: "Success!",
+        description:
+          "Your form has been submitted successfully!\nWait for your form to be Reviewed.",
+        variant: "success",
+        className: "custom-toast",
+        duration: 3000,
+      });
+
+      navigate("/");
+    } catch (error) {
+      toast({
+        title: "Error!",
+        variant: "destructive",
+        description: "There was an error submitting your application.",
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+        className: "custom-toast",
+        duration: 3000,
+      });
+    } finally {
+      setIsSubmitted(false);
+    }
+  };
   const [stepper, setStepper] = useState([
     {
       state: false,
@@ -154,6 +183,7 @@ const Form = () => {
       <AppSidebar stepper={stepper} />
       <div className="flex-1">
         <Heading />
+        <Prerequisits />
         <form>
           <ApplicantDetails
             data={data}
@@ -184,20 +214,6 @@ const Form = () => {
               handleStepper={handleStepper}
             />
           )}
-          {/* {stepper[0].state && (
-            <GuarantorDetailsTable
-              data={data}
-              register={register}
-              errors={errors}
-              isValid={isValid}
-              setValue={setValue}
-              control={control}
-              retailLoanData={retailLoanData}
-              handleSelectChange={handleSelectChange}
-              stepper={stepper}
-              handleStepper={handleStepper}
-            />
-          )} */}
           {stepper[1].state && (
             <FacilityDetails
               data={data}
@@ -262,16 +278,8 @@ const Form = () => {
                   className=""
                   disabled={!tandC || isSubmitted}
                 >
-                  {!isSubmitted ? "Submit Application" : "Submitted"}
+                  {!isSubmitted ? "Submit" : "Submitted"}
                 </Button>
-
-                {/* Fancy Alert */}
-                {alertMessage && (
-                  <FancyAlert
-                    message={alertMessage}
-                    onClose={() => setAlertMessage("")}
-                  />
-                )}
               </div>
             </div>
           )}

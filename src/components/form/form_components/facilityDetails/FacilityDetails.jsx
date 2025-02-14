@@ -3,6 +3,8 @@ import { useForm } from "react-hook-form"; // Import useForm
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Table,
   TableBody,
@@ -17,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Edit2, PlusCircle, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -31,6 +34,18 @@ export function FacilityDetails({
   const [facilities, setFacilities] = useState(retailLoanData.table_lfoa || []);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
+  const facilitySchema = z.object({
+    facility_type: z.string().min(1, "Facility type is required"),
+    tenure_in_months: z.coerce
+      .number()
+      .int("Must be a whole number")
+      .positive("Must be at least 1 month"),
+    proposal_limit: z.coerce
+      .number()
+      .positive("Proposal limit must be positive"),
+    purpose: z.string().min(1, "Purpose is required"),
+  });
+
   // Initialize useForm
   const {
     data,
@@ -38,22 +53,28 @@ export function FacilityDetails({
     handleSubmit,
     reset,
     setValue: setFormValue,
+    formState: { errors },
   } = useForm({
+    resolver: zodResolver(facilitySchema),
     defaultValues: {
       facility_type: "Housing Loan",
-      tenure_in_months: "12",
-      proposal_limit: "1200000000",
-      purpose: "Financial Funding",
+      tenure_in_months: "",
+      proposal_limit: "",
+      purpose: "",
     },
   });
 
   const [editingId, setEditingId] = useState(null);
-
+  const [isFormComplete, setIsFormComplete] = useState(false);
   // Update parent form whenever facilities change
   useEffect(() => {
     setValue("table_lfoa", facilities);
   }, [facilities, setValue]);
 
+  useEffect(() => {
+    const hasErrors = Object.keys(errors).length > 0;
+    setIsFormComplete(!hasErrors && facilities.length > 0); // Ensure at least one security is added
+  }, [errors, facilities]);
   const addOrUpdateFacility = (data) => {
     let updatedFacilities;
     if (editingId) {
@@ -74,7 +95,6 @@ export function FacilityDetails({
     e.preventDefault();
     const facilityToEdit = facilities.find((facility) => facility.id === id);
     if (facilityToEdit) {
-      
       Object.entries(facilityToEdit).forEach(([key, value]) => {
         setFormValue(key, value);
       });
@@ -120,14 +140,14 @@ export function FacilityDetails({
                 <Button
                   variant="ghost"
                   onClick={(e) => editFacility(e, facility.id)}
-                  className="p-1 hover:bg-blue-100"
+                  className="p-2 hover:bg-blue-100"
                 >
                   <Edit2 className="h-4 w-4 text-blue-500" />
                 </Button>
                 <Button
                   variant="ghost"
                   onClick={() => deleteFacility(facility.id)}
-                  className="p-1 hover:bg-red-100"
+                  className="p-2 hover:bg-red-100"
                 >
                   <Trash2 className="h-4 w-4 text-red-500" />
                 </Button>
@@ -141,6 +161,9 @@ export function FacilityDetails({
         <DialogContent className="max-w-[80%] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle id="dialog-title">Add Facility</DialogTitle>
+            <DialogDescription id="dialog-description" className="hidden">
+              Please fill in the Facility details below.
+            </DialogDescription>
           </DialogHeader>
           <form className="space-y-4">
             <h1 className="form-section-title">Facility Details</h1>
@@ -154,26 +177,45 @@ export function FacilityDetails({
                   placeholder="Enter facility type"
                   className="w-full h-10 p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+                {errors.facility_type && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.facility_type.message}
+                  </p>
+                )}
               </div>
 
               <div className="form-section-content">
                 <Label htmlFor="tenure_in_months">Tenure (In Months)</Label>
                 <Input
                   id="tenure_in_months"
+                  min="0"
+                  type="number"
                   {...register("tenure_in_months", {})} // Register input
                   placeholder="Enter tenure in months"
                   className="w-full h-10 p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+                {errors.tenure_in_months && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.tenure_in_months.message}
+                  </p>
+                )}
               </div>
 
               <div className="form-section-content">
                 <Label htmlFor="proposal_limit">Loan Amount</Label>
                 <Input
                   id="proposal_limit"
+                  type="number"
+                  min="0"
                   {...register("proposal_limit")} // Register input
                   placeholder="Enter proposal limit"
                   className="w-full h-10 p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+                {errors.proposal_limit && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.proposal_limit.message}
+                  </p>
+                )}
               </div>
 
               <div className="form-section-content">
@@ -184,6 +226,12 @@ export function FacilityDetails({
                   placeholder="Enter purpose"
                   className="w-full h-24 p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+
+                {errors.purpose && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.purpose.message}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -195,9 +243,8 @@ export function FacilityDetails({
               >
                 Cancel
               </Button>
-              <Button type="button"
-               onClick={handleSubmit(addOrUpdateFacility)}>
-               {editingId ? "Update" : "Submit"} 
+              <Button type="button" onClick={handleSubmit(addOrUpdateFacility)}>
+                {editingId ? "Update" : "Submit"}
               </Button>
             </DialogFooter>
           </form>
@@ -206,7 +253,11 @@ export function FacilityDetails({
 
       {!stepper[2].state && (
         <div className="form-next-button">
-          <Button type="button" onClick={() => handleStepper(2)}>
+          <Button
+            type="button"
+            onClick={() => handleStepper(2)}
+            disabled={!isFormComplete}
+          >
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           </Button>
         </div>
