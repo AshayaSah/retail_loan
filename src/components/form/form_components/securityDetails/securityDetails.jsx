@@ -161,7 +161,7 @@ export function SecurityDetails({
   });
 
   // const watchDistrict = watch("district");
-
+  console.log("data", data);
   useEffect(() => {
     setValue("table_drge", securities);
     // console.debug("Frappe", table_drge)
@@ -171,7 +171,9 @@ export function SecurityDetails({
     const hasErrors = Object.keys(errors).length > 0;
     setIsFormComplete(!hasErrors && securities.length > 0); // Ensure at least one security is added
   }, [errors, securities]);
-  const addOrUpdateFacility = (data) => {
+
+
+  const addOrUpdateSecurity = (data) => {
     let updatedSecurities;
     if (editingId) {
       updatedSecurities = securities.map((security) =>
@@ -787,7 +789,7 @@ export function SecurityDetails({
               >
                 Cancel
               </Button>
-              <Button type="button" onClick={handleSubmit(addOrUpdateFacility)}>
+              <Button type="button" onClick={handleSubmit(addOrUpdateSecurity)}>
                 {editingId ? "Update" : "Submit"}
               </Button>
             </DialogFooter>

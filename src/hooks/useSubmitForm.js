@@ -4,32 +4,26 @@ import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 
 const apiClient = axios.create({
-  baseURL: process.env.API_BASE_URL,
+  baseURL: "http://192.168.10.41",
   headers: {
     "Content-Type": "application/json",
-    Authorization: process.env.API_AUTH_TOKEN,
-    Cookie: `sid=${process.env.API_SESSION_ID}`
+    Authorization: "6ae7332d5eccb12:e5faca4763d5930",
+    // Cookie: `sid=f379a820b483d04cc1b2263c0b93f8fef7c7b33fc8d16e4646541298`
   },
   timeout: 10000,
 });
 
-const useAddPersonalInfo = () => {
+ export default function useSubmitForm(){
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { toast } = useToast();
 
-  const addPersonalInfo = async (formData) => {
+  const postRetailLoan = async (formData) => {
     setLoading(true);
     setError(null);
 
     try {
       const { data } = await apiClient.post("/api/resource/Retail Loan", { data: formData });
-      
-      toast({
-        title: "Success",
-        description: "Personal information added successfully.",
-        variant: "success",
-      });
       return data;
     } catch (error) {
       let errorMessage = "Failed to submit personal information";
@@ -41,18 +35,11 @@ const useAddPersonalInfo = () => {
       }
 
       setError(errorMessage);
-      toast({
-        title: "Submission Failed",
-        description: errorMessage,
-        variant: "destructive",
-      });
       return { error: errorMessage };
     } finally {
       setLoading(false);
     }
   };
 
-  return { addPersonalInfo, loading, error };
+  return { postRetailLoan, loading, error };
 };
-
-export default useAddPersonalInfo;

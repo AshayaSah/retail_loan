@@ -11,19 +11,19 @@ import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import AppSidebar from "../AppSidebar";
 import Heading from "./form_components/Heading";
-import ApplicantDetails from "./form_components/ApplicantDetails";
+import ApplicantDetails from "./form_components/ApplicantDetails11";
 import { SecurityDetails } from "./form_components/securityDetails/securityDetails";
 import { FacilityDetails } from "./form_components/facilityDetails/FacilityDetails";
 import Preview from "./form_components/preview/Preview";
 import GuarantorDetailsTest from "./form_components/guarantor_details_table/GuaranterDetailsTest";
 import Prerequisits from "./form_components/Prerequisits";
-// import { useAppStore } from "../../zustand/useStore";
+import { useAppStore } from "../../zustand/useStore";
 import useSubmitForm from "@/hooks/useSubmitForm";
 import FinalStep from "./form_components/finalstep/FinalStep";
 import { Label } from "@/components/ui/label";
-
-
-
+import { toast } from "react-hot-toast";
+// import { useToast } from "@/hooks/use-toast";
+// import { ToastAction } from "@/components/ui/toast";
 // Zod Schema
 const FormSchema = z.object({
   account_number: z.string().min(1, "Required"),
@@ -32,7 +32,6 @@ const FormSchema = z.object({
 });
 
 const Form = () => {
-  const { toast } = useToast();
   const navigate = useNavigate();
   const [tandC, setTandC] = useState(false);
   const { postRetailLoan, loading, error } = useSubmitForm();
@@ -74,12 +73,7 @@ const Form = () => {
         }))
       );
     } else {
-      // Handle validation errors
-      toast({
-        title: "Validation Error",
-        description: "Please fill all required fields correctly",
-        variant: "destructive",
-      });
+      toast.error("Please fill all required fields correctly");
     }
   };
 
@@ -138,43 +132,28 @@ const Form = () => {
 
     return () => clearTimeout(timeout);
   }, [retailLoanData]);
+  const { adddPersonalInfo } = useAppStore();
 
   const onSubmit = async (data) => {
+    const toastId = toast.loading("Submitting your home loan form...", {
+      className:
+        "min-w-[320px] max-w-[90vw] text-lg p-4 rounded-md shadow-lg bg-blue-100 text-blue-800 transition ease-in-out duration-300",
+      iconTheme: { primary: "#fff", secondary: "#2563eb" },
+    });
     try {
-      // Uncomment your actual API call
-      await postRetailLoan(data);
-
-      // Clear storage only on success
-      //   localStorage.removeItem("retailLoanData");
-      //   formMethods.reset();
-
-      toast({
-        title: "Success! 🎉",
-        description: "Form submitted successfully!",
-        variant: "success",
-        className: "custom-toast",
+      await adddPersonalInfo(data);
+      toast.success("Form submitted successfully! 🎉", {
+        className:
+          "min-w-[320px] max-w-[90vw] text-lg p-4 rounded-md shadow-lg bg-green-100 text-green-800 transition ease-in-out duration-300",
       });
       navigate("/");
     } catch (error) {
-      console.error("Submission error:", error);
-
-      toast({
-        title: "Submission Failed ❌",
-        description:
-          error.message || "Failed to submit form. Please try again.",
-        variant: "destructive",
-        action: (
-          <ToastAction altText="Retry" onClick={() => handleSubmit(onSubmit)()}>
-            Retry
-          </ToastAction>
-        ),
+      toast.error(error.message || "Failed to submit form. Please try again.", {
+        className:
+          "min-w-[320px] max-w-[90vw] text-lg p-4 rounded-md shadow-lg bg-red-100 text-red-800 transition ease-in-out duration-300",
       });
-
-      // Optional: Set form error state
-      setError("root.serverError", {
-        type: "manual",
-        message: error.message,
-      });
+    } finally {
+      toast.dismiss(toastId);
     }
   };
 

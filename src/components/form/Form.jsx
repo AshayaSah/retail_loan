@@ -10,7 +10,7 @@ import { Checkbox } from "../ui/checkbox";
 
 import AppSidebar from "../AppSidebar";
 import Heading from "./form_components/Heading";
-import ApplicantDetails from "./form_components/ApplicantDetails";
+import ApplicantDetails from "./form_components/ApplicantDetails11";
 import { SecurityDetails } from "./form_components/securityDetails/securityDetails";
 import { FacilityDetails } from "./form_components/facilityDetails/FacilityDetails";
 import Preview from "./form_components/preview/Preview";
@@ -113,18 +113,6 @@ const Form = () => {
       return setError(true);
     }
   };
-
-  // // Form submission handler
-  // const onSubmit = () => {
-  //   // e.preventDefault();
-  //   console.log("Form Submitted:", retailLoanData);
-  //   setIsSubmitted(true);
-  //   setAlertMessage(
-  //     "Your form has been submitted successfully!\nWait for your form to be Reviewed."
-  //   );
-  //   adddPersonalInfo(retailLoanData);
-  //   // setIsSubmitted(false)
-  // };
 
   const onSubmit = async () => {
     console.log("Form Submitted:", retailLoanData);

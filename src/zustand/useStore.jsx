@@ -136,6 +136,7 @@ export const useAppStore = create((set) => ({
       console.log("Added resData:", resData);
     } catch (error) {
       console.error("Error adding personal info:", error);
+      throw error.message;
     }
   },
 }));

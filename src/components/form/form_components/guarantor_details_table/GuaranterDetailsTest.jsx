@@ -28,6 +28,9 @@ import {
 import { Edit2, PlusCircle, Search, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { provinceData, districtsNepali } from "../provincedetails";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
 
 export default function GuarantorDetailsTest({
   retailLoanData,
@@ -37,234 +40,120 @@ export default function GuarantorDetailsTest({
   totalSteps,
   formState,
 }) {
-  const [guarantors, setGuarantors] = useState([]);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [errors, setErrors] = useState({});
-  const [editingId, setEditingId] = useState(null);
+
+  const guarantorSchema = z.object({
+    is_existing_customer: z.enum(["YES", "NO"]),
+    account_number: z.string().optional(),
+    phone: z.string().optional(),
+    guarantor_name: z.string().min(1, "Required"),
+    email: z.string().email("Invalid email"),
+    date_of_birth: z.string().min(1, "Required"),
+    citizenship_number: z.string().optional(),
+    citizenship_issued_date: z.string().optional(),
+    citizenship_issued_district: z.string().optional(),
+    pan_number: z.string().optional(),
+    pan_registration_date: z.string().optional(),
+    pan_registration_district: z.string().optional(),
+    province: z.string().optional(),
+    district: z.string().optional(),
+    vdc__municipality: z.string().optional(),
+    ward_no: z.string().optional(),
+    grandfathers_name: z.string().optional(),
+    fathers_name: z.string().optional(),
+    mother_name: z.string().optional(),
+    spouse_name: z.string().optional(),
+    offsprings: z.string().optional(),
+  });
+
   const [currentDate, setCurrentDate] = useState("");
   const [citizenshipMinDate, setCitizenshipMinDate] = useState("");
   const [isFormComplete, setIsFormComplete] = useState(false);
 
-  const [guarantorDetails, setGuarantorDetails] = useState({
-    account_number: "13420002008",
-    phone: "9810126827",
-    is_existing_customer: "",
-    guarantor_name: "",
-    email: "",
-    date_of_birth: "",
-    citizenship_number: "",
-    citizenship_issued_date: "",
-    citizenship_issued_district: "",
-    pan_number: "",
-    pan_registration_date: "",
-    pan_registration_district: "",
-    province: "",
-    district: "",
-    vdc__municipality: "",
-    ward_no: "",
-    grandfathers_name: "",
-    fathers_name: "",
-    mother_name: "",
-    spouse_name: "",
-    offsprings: "",
-  });
 
-  // Updated Province/District/Municipality Handling
+  const [guarantors, setGuarantors] = useState(
+    Array.isArray(retailLoanData.table_ngjk) ? retailLoanData.table_ngjk : []
+  );
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [editingId, setEditingId] = useState(null);
   const [availableDistricts, setAvailableDistricts] = useState([]);
   const [availableMunicipalities, setAvailableMunicipalities] = useState([]);
 
-  // Reset dependent fields when province changes
-  const handleProvinceChange = (value) => {
-    const selectedProvince = provinceData.find((p) => p.province === value);
-    setGuarantorDetails((prev) => ({
-      ...prev,
-      province: value,
-      district: "",
-      vdc__municipality: "",
-    }));
-    setAvailableDistricts(selectedProvince?.districts || []);
-    setAvailableMunicipalities([]);
-  };
-
-  // Reset municipality when district changes
-  const handleDistrictChange = (value) => {
-    const selectedDistrict = availableDistricts.find((d) => d.name === value);
-    setGuarantorDetails((prev) => ({
-      ...prev,
-      district: value,
-      vdc__municipality: "",
-    }));
-    setAvailableMunicipalities(selectedDistrict?.municipalities || []);
-  };
-
-  // Update municipality selection
-  const handleMunicipalityChange = (value) => {
-    setGuarantorDetails((prev) => ({
-      ...prev,
-      vdc__municipality: value,
-    }));
-  };
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    watch,
+    setValue: setFormValue,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(guarantorSchema),
+    defaultValues: {
+      is_existing_customer: "",
+      account_number: "13420002008",
+      phone: "9810126827",
+    },
+  });
 
   useEffect(() => {
-    if (isFormOpen && editingId) {
-      // Rebuild dependency chain when editing existing entry
-      const province = provinceData.find((p) =>
-        p.districts.some((d) => d.name === guarantorDetails.district)
+    setValue("table_ngjk", guarantors);
+    // console.debug("Frappe", table_ngjk)
+  }, [guarantors, setValue]);
+
+  const currentProvince = watch("province");
+  const currentDistrict = watch("district");
+  const isExistingCustomer = watch("is_existing_customer");
+
+  useEffect(() => {
+    if (currentProvince) {
+      const selected = provinceData.find((p) => p.province === currentProvince);
+      setAvailableDistricts(selected?.districts || []);
+    }
+  }, [currentProvince]);
+
+  useEffect(() => {
+    if (currentDistrict) {
+      const selected = availableDistricts.find(
+        (d) => d.name === currentDistrict
       );
-
-      if (province) {
-        setAvailableDistricts(province.districts);
-        const district = province.districts.find(
-          (d) => d.name === guarantorDetails.district
-        );
-        setAvailableMunicipalities(district?.municipalities || []);
-      }
+      setAvailableMunicipalities(selected?.municipalities || []);
     }
-  }, [isFormOpen, editingId, guarantorDetails.district]);
+  }, [currentDistrict]);
 
-  const handleFetch = () => {
-    if (
-      guarantorDetails.account_number === "13420002008" &&
-      guarantorDetails.phone === "9810126827"
-    ) {
-      setTimeout(() => {
-        // Simulated API response data
-        const apiResponse = {
-          guarantor_name: "Jonathan Shrestha",
-          email: "johndoe@example.com",
-          citizenship_number: "1234567890",
-          citizenship_issued_date: "2015-06-12",
-          citizenship_issued_district: "Kathmandu",
-          pan_number: "987654321",
-          pan_registration_date: "2015-06-12",
-          pan_registration_district: "Kathmandu",
-          province: "Bagmati Province", // New province data
-          date_of_birth: "2001-01-01",
-          district: "Kathmandu", // New district value
-          vdc__municipality: "Kathmandu", // New VDC/Municipality value
-          ward_no: "10",
-          grandfathers_name: "Ram Bahadur Shrestha",
-          fathers_name: "Shyam Bahadur Shrestha",
-          mother_name: "Sita Shrestha",
-          spouse_name: "Rita Shrestha",
-          offsprings: "2",
-        };
-
-        // Update the state with the new details
-        setGuarantorDetails((prevDetails) => ({
-          ...prevDetails,
-          ...apiResponse, // Merge with the API response
-        }));
-      }, 1000);
-    }
-  };
-
-  const addPerson = (e) => {
-    e.preventDefault();
-
-    if (validate()) {
-      const newPerson = { ...guarantorDetails, id: Date.now() };
-      const updatedGuarantors = [...guarantors, newPerson];
-      setGuarantors(updatedGuarantors);
-      setValue("table_ngjk", updatedGuarantors);
-
-      clearForm();
-    }
-  };
-
-  const editPerson = (e) => {
-    e.preventDefault();
-
-    if (validate()) {
-      const updatedGuarantors = guarantors.map((person) =>
-        person.id === editingId
-          ? { ...guarantorDetails, id: editingId }
-          : person
+  const addOrUpdateGuarantors = (data) => {
+    let UpdateGuarantors;
+    if (editingId) {
+      UpdateGuarantors = guarantors.map((security) =>
+        security.id === editingId ? { ...data, id: editingId } : security
       );
-
-      setGuarantors(updatedGuarantors);
-      setValue("table_ngjk", updatedGuarantors);
-      setEditingId(null);
-      setIsFormOpen(false);
-      clearForm();
+    } else {
+      UpdateGuarantors = [...guarantors, { ...data, id: Date.now() }];
     }
+
+    setGuarantors(UpdateGuarantors);
+    reset();
+    setIsFormOpen(false);
+    setEditingId(null);
   };
 
-  const handleEdit = (e, id) => {
+  const editGuarantors = (e, id) => {
     e.preventDefault();
-    const guarantorToEdit = guarantors.find((person) => person.id === id);
+    const guarantorToEdit = guarantors.find((guarantor) => guarantor.id === id);
     if (guarantorToEdit) {
-      setGuarantorDetails(guarantorToEdit);
+      Object.entries(guarantorToEdit).forEach(([key, value]) => {
+        setFormValue(key, value);
+      });
       setEditingId(id);
       setIsFormOpen(true);
     }
   };
 
-  const clearForm = () => {
-    setGuarantorDetails({
-      is_existing_customer: "",
-      account_number: "",
-      guarantor_name: "",
-      email: "",
-      phone: "",
-      date_of_birth: "",
-      citizenship_number: "",
-      citizenship_issued_date: "",
-      citizenship_issued_district: "",
-      pan_number: "",
-      pan_registration_date: "",
-      pan_registration_district: "",
-      province: "",
-      district: "",
-      vdc__municipality: "",
-      ward_no: "",
-      grandfathers_name: "",
-      fathers_name: "",
-      mother_name: "",
-      spouse_name: "",
-      offsprings: "",
-    });
-    setIsFormOpen(false);
-    setErrors({});
-  };
-
-  const handleChange = (e) => {
-    const { id, value } = e.target;
-    setGuarantorDetails((prev) => ({ ...prev, [id]: value }));
-  };
-
-  const validate = () => {
-    const newErrors = {};
-    if (!guarantorDetails.is_existing_customer) {
-      newErrors.is_existing_customer = "This field is required.";
-    }
-    if (guarantorDetails.is_existing_customer === "YES") {
-      if (!guarantorDetails.account_number) {
-        newErrors.account_number = "Please, enter your account number.";
-      }
-    }
-    if (!guarantorDetails.guarantor_name) {
-      newErrors.custom_customer_name = "Full name is required.";
-    }
-    if (!guarantorDetails.email) {
-      newErrors.email = "Email is required.";
-    }
-    if (!guarantorDetails.phone) {
-      newErrors.phone = "Phone number is required.";
-    }
-    // Add more validations as needed...
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const deletePerson = (id) => {
-    // Filter out the person to be deleted from the local state
-    const updatedPeople = guarantors.filter((person) => person.id !== id);
-    setGuarantors(updatedPeople);
-
-    setValue("guarantors", updatedPeople);
+  const deleteGuarantors = (id) => {
+    const UpdateGuarantors = guarantors.filter(
+      (guarantor) => guarantor.id !== id
+    );
+    setGuarantors(UpdateGuarantors);
   };
 
   const filteredPeople = guarantors.filter(
@@ -314,14 +203,44 @@ export default function GuarantorDetailsTest({
   };
 
   const handleClose = () => {
-    clearForm();
+    reset();
     setIsFormOpen(false);
+  };
+
+  const handleFetch = () => {
+    if (
+      guarantors.account_number == "13420002008" &&
+      guarantors.phone == "9810126827"
+    ) {
+      setTimeout(() => {
+        setGuarantors({
+          ...guarantors,
+          guarantor_name: "Jonathan Shrestha",
+          email: "johndoe@example.com",
+          citizenship_number: "1234567890",
+          citizenship_issued_date: "2015-06-12",
+          citizenship_issued_district: "Kathmandu",
+          pan_number: "987654321",
+          pan_registration_date: "2015-06-12",
+          pan_registration_district: "Kathmandu",
+          province: "Bagmati Province",
+          district: "Kathmandu",
+          vdc__municipality: "Kathmandu",
+          ward_no: "10",
+          grandfathers_name: "Ram Bahadur Shrestha",
+          fathers_name: "Shyam Bahadur Shrestha",
+          mother_name: "Sita Shrestha",
+          spouse_name: "Rita Shrestha",
+          offsprings: "2",
+        });
+      }, 1000);
+    }
   };
 
   useEffect(() => {
     // This will run when the date_of_birth changes
     const calculateMinCitizenshipDate = () => {
-      const dob = retailLoanData.date_of_birth;
+      const dob = guarantors.date_of_birth;
       const today = new Date(dob);
 
       if (!dob || isNaN(today.getTime())) return;
@@ -335,7 +254,7 @@ export default function GuarantorDetailsTest({
     };
 
     calculateMinCitizenshipDate();
-  }, [guarantorDetails.date_of_birth]);
+  }, [guarantors.date_of_birth]);
 
   useEffect(() => {
     const hasErrors = Object.keys(errors).length > 0;
@@ -350,7 +269,6 @@ export default function GuarantorDetailsTest({
           type="button"
           onClick={() => {
             setEditingId(null);
-            clearForm();
             setIsFormOpen(true);
           }}
         >
@@ -389,7 +307,7 @@ export default function GuarantorDetailsTest({
               <TableCell className="flex gap-3">
                 <Button
                   variant="ghost"
-                  onClick={(e) => handleEdit(e, person.id)}
+                  onClick={(e) => editGuarantors(e, person.id)}
                   className="p-2 hover:bg-blue-100"
                 >
                   <Edit2 className="h-4 w-4 text-blue-500" />
@@ -397,7 +315,7 @@ export default function GuarantorDetailsTest({
                 <Button
                   variant="ghost"
                   type="button"
-                  onClick={() => deletePerson(person.id)}
+                  onClick={() => deleteGuarantors(person.id)}
                   //  className="p-1 hover:scale-105 hover:bg-red-100"
                   className="flex items-center justify-center p-2 text-red-500 rounded-lg transition-transform transform hover:scale-105 hover:bg-red-100"
                 >
@@ -426,77 +344,79 @@ export default function GuarantorDetailsTest({
                     Are you an Existing CAS Bank Customer?{" "}
                     <span className="text-red-600">*</span>
                   </Label>
-                  <Select
-                    id="is_existing_customer"
-                    value={guarantorDetails.is_existing_customer}
-                    onValueChange={(value) =>
-                      handleChange({
-                        target: { id: "is_existing_customer", value },
-                      })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="YES">YES</SelectItem>
-                      <SelectItem value="NO">NO</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Controller
+                    name="is_existing_customer"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          // if (value === "NO") {
+                          //   setValue("account_number", "");
+                          //   setValue("phone", "");
+                          // }
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="YES">YES</SelectItem>
+                          <SelectItem value="NO">NO</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                   {errors.is_existing_customer && (
                     <p className="text-red-600 text-sm">
-                      {errors.is_existing_customer}
+                      {errors.is_existing_customer.message}
                     </p>
                   )}
                 </div>
               </div>
 
-              {guarantorDetails.is_existing_customer === "YES" && (
+              {watch("is_existing_customer") === "YES" && (
                 <>
-                  {/* Account Number */}
                   <div className="form-section-content-container">
                     <div className="form-section-content">
                       <Label htmlFor="account_number">
                         Account Number <span className="text-red-600">*</span>
                       </Label>
                       <Input
-                        id="account_number"
-                        value={guarantorDetails.account_number}
-                        onChange={handleChange}
+                        {...register("account_number")}
                         placeholder="Enter your account number"
                       />
                       {errors.account_number && (
                         <p className="text-red-600 text-sm">
-                          {errors.account_number}
+                          {errors.account_number.message}
                         </p>
                       )}
                     </div>
 
-                    {/* Phone Number */}
                     <div className="form-section-content">
                       <Label htmlFor="phone">
                         Phone Number <span className="text-red-600">*</span>
                       </Label>
                       <Input
-                        id="phone"
+                        {...register("phone")}
                         type="tel"
-                        value={guarantorDetails.phone}
-                        onChange={handleChange}
                         placeholder="Enter your phone number"
                       />
                       {errors.phone && (
-                        <p className="text-red-600 text-sm">{errors.phone}</p>
+                        <p className="text-red-600 text-sm">
+                          {errors.phone.message}
+                        </p>
                       )}
                     </div>
 
                     <div className="form-section-content">
-                      <Button type="button" onClick={() => handleFetch()}>
+                      <Button type="button" onClick={handleFetch}>
                         Fetch Data
                       </Button>
                     </div>
                   </div>
 
-                  {/* Personal Information Section */}
                   <h1 className="form-section-title">Personal Information</h1>
                   <div className="form-section-content-container">
                     <div className="form-section-content">
@@ -504,29 +424,28 @@ export default function GuarantorDetailsTest({
                         Guarantor Full Name
                       </Label>
                       <Input
-                        id="guarantor_name"
-                        value={guarantorDetails.guarantor_name}
-                        onChange={handleChange}
+                        {...register("guarantor_name")}
                         placeholder="Enter your full name"
                       />
                       {errors.guarantor_name && (
                         <p className="text-red-600 text-sm">
-                          {errors.guarantor_name}
+                          {errors.guarantor_name.message}
                         </p>
                       )}
                     </div>
-                    {/* Date of Birth */}
-                    <div className="form-section-content ">
+
+                    <div className="form-section-content">
                       <Label htmlFor="date_of_birth">
                         Date of Birth <span className="text-red-600">*</span>
                       </Label>
                       <Input
-                        id="date_of_birth"
+                        {...register("date_of_birth")}
                         type="date"
-                        value={guarantorDetails.date_of_birth}
-                        onChange={handleAgeChangeandCalculation}
-                        placeholder="Enter your date of Birth"
-                        max={currentDate}
+                        max={(new Date().toISOString().split("T")[0]) + 16}
+                        onChange={(e) => {
+                          register("date_of_birth").onChange(e);
+                          handleAgeCalculation(e);
+                        }}
                       />
                       {errors.date_of_birth && (
                         <p className="text-red-600 text-sm">
@@ -534,44 +453,35 @@ export default function GuarantorDetailsTest({
                         </p>
                       )}
                     </div>
-                    {/* Email */}
+
                     <div className="form-section-content">
                       <Label htmlFor="email">
                         Email Address <span className="text-red-600">*</span>
                       </Label>
                       <Input
-                        id="email"
+                        {...register("email")}
                         type="email"
-                        value={guarantorDetails.email}
-                        onChange={handleChange}
                         placeholder="Enter your email"
                       />
                       {errors.email && (
-                        <p className="text-red-600 text-sm">{errors.email}</p>
+                        <p className="text-red-600 text-sm">
+                          {errors.email.message}
+                        </p>
                       )}
                     </div>
+
                     <div className="form-section-content">
                       <Label htmlFor="nationality">
                         Nationality <span className="text-red-600">*</span>
                       </Label>
                       <Input
-                        id="nationality"
-                        type="tel"
-                        value={guarantorDetails.nationality}
+                        {...register("nationality")}
                         defaultValue="Nepali"
-                        onChange={handleChange}
-                        placeholder="Enter your email"
                         disabled
                       />
-                      {errors.email && (
-                        <p className="text-red-600 text-sm">
-                          {errors.nationality}
-                        </p>
-                      )}
                     </div>
                   </div>
 
-                  {/* Citizenship and PAN Information Section */}
                   <h1 className="form-section-title">
                     Citizenship and PAN Information
                   </h1>
@@ -581,138 +491,96 @@ export default function GuarantorDetailsTest({
                         Citizenship Number
                       </Label>
                       <Input
-                        id="citizenship_number"
-                        type="tel"
-                        value={guarantorDetails.citizenship_number}
-                        onChange={handleChange}
+                        {...register("citizenship_number")}
                         placeholder="Enter your citizenship number"
                       />
                       {errors.citizenship_number && (
                         <p className="text-red-600 text-sm">
-                          {errors.citizenship_number}
+                          {errors.citizenship_number.message}
                         </p>
                       )}
                     </div>
 
                     <div className="form-section-content">
                       <Label htmlFor="citizenship_issued_date">
-                        Citizenship Issued Date (DD/MM/YYYY)
+                        Citizenship Issued Date
                       </Label>
                       <Input
-                        id="citizenship_issued_date"
+                        {...register("citizenship_issued_date")}
                         type="date"
                         min={citizenshipMinDate}
-                        value={guarantorDetails.citizenship_issued_date}
-                        onChange={handleChange}
-                        placeholder="DD/MM/YYYY"
+                        max={new Date().toISOString().split("T")[0]}
                       />
-                      {errors.citizenship_issued_date && (
-                        <p className="text-red-600 text-sm">
-                          {errors.citizenship_issued_date}
-                        </p>
-                      )}
                     </div>
 
                     <div className="form-section-content">
                       <Label htmlFor="citizenship_issued_district">
                         Citizenship Issued District
                       </Label>
-                      <Select
-                        id="citizenship_issued_district"
-                        value={guarantorDetails.citizenship_issued_district}
-                        onValueChange={(value) =>
-                          handleChange({
-                            target: {
-                              id: "citizenship_issued_district",
-                              value,
-                            },
-                          })
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Citizenship Issued district" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {districtsNepali.map((district) => (
-                            <SelectItem key={district} value={district}>
-                              {district}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {errors.citizenship_issued_district && (
-                        <p className="text-red-600 text-sm">
-                          {errors.citizenship_issued_district}
-                        </p>
-                      )}
+                      <Controller
+                        name="citizenship_issued_district"
+                        control={control}
+                        render={({ field }) => (
+                          <Select {...field} onValueChange={field.onChange}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select district" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {districtsNepali.map((district) => (
+                                <SelectItem key={district} value={district}>
+                                  {district}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
                     </div>
 
                     <div className="form-section-content">
                       <Label htmlFor="pan_number">PAN Number</Label>
                       <Input
-                        id="pan_number"
-                        type="text"
-                        value={guarantorDetails.pan_number}
-                        onChange={handleChange}
+                        {...register("pan_number")}
                         placeholder="Enter your PAN number"
+                        minLength="6"  
                       />
-                      {errors.pan_number && (
-                        <p className="text-red-600 text-sm">
-                          {errors.pan_number}
-                        </p>
-                      )}
                     </div>
 
                     <div className="form-section-content">
                       <Label htmlFor="pan_registration_date">
-                        PAN Issued Date (DD/MM/YYYY)
+                        PAN Issued Date
                       </Label>
                       <Input
-                        id="pan_registration_date"
+                        {...register("pan_registration_date")}
                         type="date"
-                        value={guarantorDetails.pan_registration_date}
-                        onChange={handleChange}
-                        placeholder="DD/MM/YYYY"
                       />
-                      {errors.pan_registration_date && (
-                        <p className="text-red-600 text-sm">
-                          {errors.pan_registration_date}
-                        </p>
-                      )}
                     </div>
 
                     <div className="form-section-content">
                       <Label htmlFor="pan_registration_district">
-                        Pan Issued District
+                        PAN Issued District
                       </Label>
-                      <Select
-                        id="pan_registration_district"
-                        value={guarantorDetails.pan_registration_district}
-                        onValueChange={(value) =>
-                          handleChange({
-                            target: { id: "pan_registration_district", value },
-                          })
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select your district" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {districtsNepali.map((district) => (
-                            <SelectItem key={district} value={district}>
-                              {district}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {errors.pan_registration_district && (
-                        <p className="text-red-600 text-sm">
-                          {errors.pan_registration_district.message}
-                        </p>
-                      )}
+                      <Controller
+                        name="pan_registration_district"
+                        control={control}
+                        render={({ field }) => (
+                          <Select {...field} onValueChange={field.onChange}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select district" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {districtsNepali.map((district) => (
+                                <SelectItem key={district} value={district}>
+                                  {district}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
                     </div>
                   </div>
-                  {/* Family Information Section */}
+
                   <h1 className="form-section-title">Family Information</h1>
                   <div className="form-section-content-container">
                     <div className="form-section-content">
@@ -720,196 +588,162 @@ export default function GuarantorDetailsTest({
                         Grandfather's Name
                       </Label>
                       <Input
-                        id="grandfathers_name"
-                        value={guarantorDetails.grandfathers_name}
-                        onChange={handleChange}
+                        {...register("grandfathers_name")}
                         placeholder="Enter grandfather's name"
                       />
-                      {errors.grandfathers_name && (
-                        <p className="text-red-600 text-sm">
-                          {errors.grandfathers_name}
-                        </p>
-                      )}
                     </div>
 
                     <div className="form-section-content">
                       <Label htmlFor="fathers_name">Father's Name</Label>
                       <Input
-                        id="fathers_name"
-                        value={guarantorDetails.fathers_name}
-                        onChange={handleChange}
+                        {...register("fathers_name")}
                         placeholder="Enter father's name"
                       />
-                      {errors.fathers_name && (
-                        <p className="text-red-600 text-sm">
-                          {errors.fathers_name}
-                        </p>
-                      )}
                     </div>
 
                     <div className="form-section-content">
                       <Label htmlFor="mother_name">Mother's Name</Label>
                       <Input
-                        id="mother_name"
-                        value={guarantorDetails.mother_name}
-                        onChange={handleChange}
+                        {...register("mother_name")}
                         placeholder="Enter mother's name"
                       />
-                      {errors.mother_name && (
-                        <p className="text-red-600 text-sm">
-                          {errors.mother_name}
-                        </p>
-                      )}
                     </div>
 
                     <div className="form-section-content">
                       <Label htmlFor="spouse_name">Spouse's Name</Label>
                       <Input
-                        id="spouse_name"
-                        value={guarantorDetails.spouse_name}
-                        onChange={handleChange}
-                        placeholder="Enter spouse's name (if applicable)"
+                        {...register("spouse_name")}
+                        placeholder="Enter spouse's name"
                       />
-                      {errors.spouse_name && (
-                        <p className="text-red-600 text-sm">
-                          {errors.spouse_name}
-                        </p>
-                      )}
                     </div>
 
                     <div className="form-section-content">
                       <Label htmlFor="offsprings">Number of Offsprings</Label>
                       <Input
-                        id="offsprings"
+                        {...register("offsprings")}
                         type="number"
-                        value={guarantorDetails.offsprings}
-                        onChange={handleChange}
                         placeholder="Enter number of children"
+                        min="0"
                       />
-                      {errors.offsprings && (
-                        <p className="text-red-600 text-sm">
-                          {errors.offsprings}
-                        </p>
-                      )}
                     </div>
                   </div>
 
-                  {/* Permanent Address*/}
                   <h1 className="form-section-title">Permanent Address</h1>
                   <div className="form-section-content-container">
                     <div className="form-section-content">
                       <Label htmlFor="province">Province</Label>
-                      <Select
-                        id="province"
-                        value={guarantorDetails.province}
-                        onValueChange={handleProvinceChange}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Province" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {provinceData.map((province) => (
-                            <SelectItem
-                              key={province.province}
-                              value={province.province}
-                            >
-                              {province.province}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {errors.citizenship_issued_district && (
-                        <p className="text-red-600 text-sm">
-                          {errors.citizenship_issued_district}
-                        </p>
-                      )}
+                      <Controller
+                        name="province"
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            {...field}
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              handleProvinceChange(value);
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Province" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {provinceData.map((province) => (
+                                <SelectItem
+                                  key={province.province}
+                                  value={province.province}
+                                >
+                                  {province.province}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
                     </div>
 
                     <div className="form-section-content">
                       <Label htmlFor="district">District</Label>
-                      <Select
-                        id="district"
-                        value={guarantorDetails.district}
-                        onValueChange={handleDistrictChange}
-                        // disabled={!guarantorDetails.province}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select your district" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {availableDistricts.map((district) => (
-                            <SelectItem
-                              key={district.name}
-                              value={district.name}
-                            >
-                              {district.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {errors.pan_registration_district && (
-                        <p className="text-red-600 text-sm">
-                          {errors.pan_registration_district.message}
-                        </p>
-                      )}
+                      <Controller
+                        name="district"
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            {...field}
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              handleDistrictChange(value);
+                            }}
+                            disabled={!watch("province")}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select district" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {availableDistricts.map((district) => (
+                                <SelectItem
+                                  key={district.name}
+                                  value={district.name}
+                                >
+                                  {district.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
                     </div>
 
                     <div className="form-section-content">
                       <Label htmlFor="vdc__municipality">
                         VDC/Municipality
                       </Label>
-                      <Select
-                        id="vdc__municipality"
-                        value={guarantorDetails.vdc__municipality}
-                        onValueChange={handleMunicipalityChange}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select your municipality" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {availableMunicipalities.map((municipality) => (
-                            <SelectItem key={municipality} value={municipality}>
-                              {municipality}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {errors.vdc__municipality && (
-                        <p className="text-red-600 text-sm">
-                          {errors.vdc__municipality.message}
-                        </p>
-                      )}
+                      <Controller
+                        name="vdc__municipality"
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            {...field}
+                            onValueChange={field.onChange}
+                            disabled={!watch("district")}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select municipality" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {availableMunicipalities.map((municipality) => (
+                                <SelectItem
+                                  key={municipality}
+                                  value={municipality}
+                                >
+                                  {municipality}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
                     </div>
 
                     <div className="form-section-content">
                       <Label htmlFor="ward_no">Ward No.</Label>
                       <Input
-                        id="ward_no"
-                        value={guarantorDetails.ward_no}
-                        onChange={handleChange}
+                        {...register("ward_no")}
                         placeholder="Enter Ward No."
                       />
-                      {errors.ward_no && (
-                        <p className="text-red-600 text-sm">{errors.ward_no}</p>
-                      )}
                     </div>
                   </div>
                 </>
               )}
             </div>
-
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={handleClose}>
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                onClick={!!editingId ? editPerson : addPerson}
-              >
-                {editingId ? "Update" : "Submit"}
-              </Button>
-            </DialogFooter>
           </form>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button type="button" onClick={handleSubmit(addOrUpdateGuarantors)}>
+              {editingId ? "Update" : "Submit"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
       {currentStep < totalSteps - 1 && (
