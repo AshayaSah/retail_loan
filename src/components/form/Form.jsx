@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { User, Users, Building, Shield } from "lucide-react";
 import { useAppStore } from "../../zustand/useStore";
 import { useForm, useWatch } from "react-hook-form";
@@ -11,12 +11,10 @@ import { Checkbox } from "../ui/checkbox";
 import AppSidebar from "../AppSidebar";
 import Heading from "./form_components/Heading";
 import ApplicantDetails from "./form_components/ApplicantDetails";
-import { GuarantorDetailsTable } from "./form_components/guarantor_details_table/GuarantorDetailsTable";
 import { SecurityDetails } from "./form_components/securityDetails/securityDetails";
 import { FacilityDetails } from "./form_components/facilityDetails/FacilityDetails";
 import Preview from "./form_components/preview/Preview";
 import GuarantorDetailsTest from "./form_components/guarantor_details_table/GuaranterDetailsTest";
-import FancyAlert from "./alert/FancyAlert";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import Prerequisits from "./form_components/Prerequisits";
@@ -33,14 +31,11 @@ const Form = () => {
     handleSubmit,
     setValue,
     control,
+    watch,
     formState: { errors, isValid },
   } = useForm();
 
   const {
-    currentEdit,
-    addPersonalInfo,
-    updatePersonalInfo,
-    clearCurrentEdit,
     adddPersonalInfo,
   } = useAppStore();
 
@@ -50,6 +45,20 @@ const Form = () => {
 
   // Watch all form values at once
   const retailLoanData = useWatch({ control });
+
+  // Save form data to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("retailLoanData", JSON.stringify(retailLoanData));
+  }, [retailLoanData]);
+
+  // Load form data from localStorage
+  useEffect(() => {
+    const storedData = localStorage.getItem("retailLoanData");
+    if (storedData) {
+      const parsedData = JSON.parse(storedData);
+      Object.keys(parsedData).forEach((key) => setValue(key, parsedData[key]));
+    }
+  }, [setValue]);
 
   useEffect(() => {
     console.log("All Form Values:", retailLoanData);
@@ -90,10 +99,10 @@ const Form = () => {
           offsprings: "2",
           spouse_name: "None",
 
-          // province: "Bagmati Province",
-          // district: "Lalitpur",
-          // vdc_municipality: "Mahalaxmi",
-          // ward_no: "10",
+          province: "Bagmati Province",
+          district: "Lalitpur",
+          vdc_municipality: "Mahalaxmi",
+          ward_no: "10",
         };
 
         Object.keys(fetchData).forEach((key) => setValue(key, fetchData[key]));
@@ -129,22 +138,40 @@ const Form = () => {
         variant: "success",
         className: "custom-toast",
         duration: 3000,
+        viewportVariant: "top-0 left-1/2 transform -translate-x-1/2 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:flex-col md:max-w-[420px]",
+        toastVariants: {
+          variant: "default",
+          position: "top-0 left-1/2 transform -translate-x-1/2 z-[100] flex fixed md:max-w-[420px]",
+          size: "lg", // Adjust the size as needed
+        },
       });
 
       navigate("/");
-    } catch (error) {
+      
+    } catch(error) {
+      if(error.messsage === "Network Error") {
+      console.log(error);
       toast({
+        error: true,
         title: "Error!",
         variant: "destructive",
         description: "There was an error submitting your application.",
         action: <ToastAction altText="Try again">Try again</ToastAction>,
         className: "custom-toast",
         duration: 3000,
-      });
+        viewportVariant: "top-0 left-1/2 transform -translate-x-1/2 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:flex-col md:max-w-[420px]",
+        toastVariants: {
+          variant: "default",
+          position: "top-0 left-1/2 transform -translate-x-1/2 z-[100] flex fixed md:max-w-[420px]",
+          size: "lg", // Adjust the size as needed
+        }})}
     } finally {
-      setIsSubmitted(false);
+      setTimeout(() => {
+        setIsSubmitted(false);
+      }, 100);
     }
   };
+
   const [stepper, setStepper] = useState([
     {
       state: false,
@@ -186,6 +213,7 @@ const Form = () => {
         <Prerequisits />
         <form>
           <ApplicantDetails
+            watch={watch}
             data={data}
             loading={loading}
             error={error}
@@ -249,11 +277,11 @@ const Form = () => {
               <div className="form-section-content">
                 <div className="flex items-center space-x-2">
                   <Checkbox
-                    id="same_address"
+                    id="form_tandc"
                     checked={tandC}
                     onCheckedChange={(checked) => setTandC(checked)}
                   />
-                  <Label htmlFor="same_address">
+                  <Label htmlFor="form_tandc">
                     I acknowledge that the information provided is accurate and
                     has been reviewed diligently. I accept full responsibility
                     for its completeness and correctness upon submission.

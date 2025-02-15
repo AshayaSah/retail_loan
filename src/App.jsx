@@ -1,14 +1,15 @@
 import React from "react";
 import "./App.css";
 import { ThemeProvider } from "./components/theme-provider";
-import Form from "./components/form/Form";
+import Form from "./components/form/Formq";
 import { SidebarProvider } from "./components/ui/sidebar";
 import AppSidebar from "./components/AppSidebar";
 import Navbar from "./components/navbar/NavbarUpdated";
 import { Route, Routes } from "react-router-dom";
 import { LoginForm } from "./components/login-form";
 import Homepage from "./components/homepage/Homepage";
-import AuthProvider from "./components/auth/AuthProvider";
+
+
 
 const App = () => {
   return (
@@ -18,7 +19,7 @@ const App = () => {
           {/* <AppSidebar /> */}
           <main className="w-full">
             <Routes>
-              <Route path="/login" element={<AuthProvider />} />
+              {/* <Route path="/login" element={<AuthProvider />} /> */}
               <Route path="/form" element={<Form />} />
               <Route path="/" element={<Homepage />} /> 
             </Routes>

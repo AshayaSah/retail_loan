@@ -28,10 +28,14 @@ import { Textarea } from "@/components/ui/textarea";
 export function FacilityDetails({
   retailLoanData,
   setValue,
-  stepper,
-  handleStepper,
+  onNextStep,
+  currentStep,
+  totalSteps,
+  formState,
 }) {
-  const [facilities, setFacilities] = useState(retailLoanData.table_lfoa || []);
+  const [facilities, setFacilities] = useState(
+    Array.isArray(retailLoanData.table_lfoa) ? retailLoanData.table_lfoa : []
+  );
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const facilitySchema = z.object({
@@ -251,14 +255,15 @@ export function FacilityDetails({
         </DialogContent>
       </Dialog>
 
-      {!stepper[2].state && (
-        <div className="form-next-button">
+      {currentStep < totalSteps - 1 && (
+        <div className="flex justify-end mt-8">
           <Button
             type="button"
-            onClick={() => handleStepper(2)}
-            disabled={!isFormComplete}
+            onClick={onNextStep}
+            disabled={!formState.isValid}
+            className="px-8 py-4 text-lg"
           >
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Next →
           </Button>
         </div>
       )}

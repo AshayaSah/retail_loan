@@ -1,17 +1,35 @@
-import path from "path"
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import path from 'path';
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { visualizer } from 'rollup-plugin-visualizer'; // Updated import
 
-// https://vite.dev/config/
 export default defineConfig({
- server: {
-    host: '0.0.0.0', // Allow access from any IP address
-    // No need to specify port, it will default to 5173
-  },
-  plugins: [react()],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
+  server: {
+    host: '0.0.0.0',
+    port: 3000,
+    watch: {
+      usePolling: true,
     },
   },
-})
+  plugins: [
+    react(),
+    visualizer({ open: false, apply: 'build' }), // Updated usage
+  ],
+  base: './',
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+  build: {
+    watch: {
+      clearScreen: false,
+    },
+    rollupOptions: {
+      output: {
+        // chunkFileNames: '[name]-[hash].js',
+        // entryFileNames: '[name]-[hash].js',
+      },
+    },
+  },
+});

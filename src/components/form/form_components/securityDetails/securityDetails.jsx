@@ -31,31 +31,78 @@ import {
 import { Edit2, PlusCircle, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { districtsNepali } from "../provincedetails";
+import { districtsNepali, provinceData } from "../provincedetails";
 
 export function SecurityDetails({
   retailLoanData,
   setValue,
-  stepper,
-  handleStepper,
+  onNextStep,
+  currentStep,
+  totalSteps,
+  formState,
 }) {
-  const [securities, setSecurities] = useState(retailLoanData.table_drge || []);
+  const [securities, setSecurities] = useState(
+    Array.isArray(retailLoanData.table_drge) ? retailLoanData.table_drge : []
+  );
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [isFormComplete, setIsFormComplete] = useState(false);
 
+  // const securitySchema = z.object({
+  //   // Required fields
+  //   property: z.string().min(1, "Property selection is required"),
+  //   name_of_owner: z.string().min(1, "Owner name is required"),
+  //   area: z.coerce.number().positive("Area must be a positive number"),
+  //   location_of_property: z.string().min(1, "Location is required"),
+  //   province: z.string().min(1, "Province is required"),
+  //   district: z.string().min(1, "District is required"),
+
+  //   // Optional fields
+  //   vdcmunicipality: z.string().optional().or(z.literal("")),
+  //   ward_no: z.coerce.number().nonnegative().optional(),
+  //   placestreet_name: z.string().optional().or(z.literal("")),
+  //   plot_no: z.string().optional().or(z.literal("")),
+  //   land_revenue_office: z.string().optional().or(z.literal("")),
+  //   shape_of_land: z.string().optional().or(z.literal("")),
+  //   motorable_road_access: z.string().optional().or(z.literal("")),
+  //   road_width: z.string().optional().or(z.literal("")),
+  //   road_access_from: z.string().optional().or(z.literal("")),
+  //   road_setbacks: z.string().optional().or(z.literal("")),
+  //   river_setbacks: z.string().optional().or(z.literal("")),
+  //   high_tension_setbacks: z.string().optional().or(z.literal("")),
+  //   // Contact info (optional with validation)
+  //   email: z
+  //     .string()
+  //     .email("Invalid email address")
+  //     .optional()
+  //     .or(z.literal("")),
+  //   phone: z
+  //     .string()
+  //     .regex(/^[0-9]{10}$/, "Invalid phone number (10 digits)")
+  //     .optional()
+  //     .or(z.literal("")),
+  // });
+
+  // Initialize useForm
+
+  // Zod schema with preprocess for numeric fields
   const securitySchema = z.object({
-    // Required fields
     property: z.string().min(1, "Property selection is required"),
     name_of_owner: z.string().min(1, "Owner name is required"),
-    area: z.coerce.number().positive("Area must be a positive number"),
+    area: z.preprocess(
+      (val) => (val === "" ? undefined : Number(val)),
+      z.number().positive("Area must be a positive number")
+    ),
     location_of_property: z.string().min(1, "Location is required"),
     province: z.string().min(1, "Province is required"),
     district: z.string().min(1, "District is required"),
-
-    // Optional fields
     vdcmunicipality: z.string().optional().or(z.literal("")),
-    ward_no: z.coerce.number().nonnegative().optional(),
+    ward_no: z
+      .preprocess(
+        (val) => (val === "" ? undefined : Number(val)),
+        z.number().nonnegative("Ward number must be nonnegative")
+      )
+      .optional(),
     placestreet_name: z.string().optional().or(z.literal("")),
     plot_no: z.string().optional().or(z.literal("")),
     land_revenue_office: z.string().optional().or(z.literal("")),
@@ -66,8 +113,6 @@ export function SecurityDetails({
     road_setbacks: z.string().optional().or(z.literal("")),
     river_setbacks: z.string().optional().or(z.literal("")),
     high_tension_setbacks: z.string().optional().or(z.literal("")),
-
-    // Contact info (optional with validation)
     email: z
       .string()
       .email("Invalid email address")
@@ -80,11 +125,11 @@ export function SecurityDetails({
       .or(z.literal("")),
   });
 
-  // Initialize useForm
   const {
     data,
     register,
     handleSubmit,
+    watch,
     reset,
     control,
     formState: { errors },
@@ -114,6 +159,8 @@ export function SecurityDetails({
       high_tension_setbacks: "",
     },
   });
+
+  // const watchDistrict = watch("district");
 
   useEffect(() => {
     setValue("table_drge", securities);
@@ -158,6 +205,52 @@ export function SecurityDetails({
     );
     setSecurities(updatedSecurities);
   };
+
+  // // Updated Province/District/Municipality Handling
+  const [availableDistricts, setAvailableDistricts] = useState([]);
+  const [availableMunicipalities, setAvailableMunicipalities] = useState([]);
+  // Reset dependent fields when province changes
+  // Update province selection and reset dependent fields using form state
+  const handleProvinceChange = (value) => {
+    setFormValue("province", value);
+    setFormValue("district", "");
+    setFormValue("vdcmunicipality", "");
+    const selectedProvince = provinceData.find((p) => p.province === value);
+    setAvailableDistricts(selectedProvince?.districts || []);
+    setAvailableMunicipalities([]);
+  };
+
+  // Update district selection and reset municipality
+  const handleDistrictChange = (value) => {
+    setFormValue("district", value);
+    setFormValue("vdcmunicipality", "");
+    const selectedDistrict = availableDistricts.find((d) => d.name === value);
+    setAvailableMunicipalities(selectedDistrict?.municipalities || []);
+  };
+
+  // Update municipality selection
+  const handleMunicipalityChange = (value) => {
+    setFormValue("vdcmunicipality", value);
+  };
+
+  // Rebuild dependency chain when editing an entry
+  useEffect(() => {
+    if (isFormOpen && editingId) {
+      const currentSecurity = securities.find((sec) => sec.id === editingId);
+      if (currentSecurity) {
+        const province = provinceData.find(
+          (p) => p.province === currentSecurity.province
+        );
+        if (province) {
+          setAvailableDistricts(province.districts);
+          const district = province.districts.find(
+            (d) => d.name === currentSecurity.district
+          );
+          setAvailableMunicipalities(district?.municipalities || []);
+        }
+      }
+    }
+  }, [isFormOpen, editingId, securities]);
 
   return (
     <Card className="form-section shadow-lg">
@@ -311,10 +404,30 @@ export function SecurityDetails({
 
               <div className="form-section-content">
                 <Label htmlFor="province">Province</Label>
-                <Input
-                  id="province"
-                  {...register("province")} // Register input
-                  placeholder="Enter province"
+                <Controller
+                  name="province"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      id="province"
+                      value={field.value}
+                      onValueChange={handleProvinceChange}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Province" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {provinceData.map((province) => (
+                          <SelectItem
+                            key={province.province}
+                            value={province.province}
+                          >
+                            {province.province}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 />
                 {errors.province && (
                   <p className="text-red-600 text-sm">
@@ -325,10 +438,28 @@ export function SecurityDetails({
 
               <div className="form-section-content">
                 <Label htmlFor="district">District</Label>
-                <Input
-                  id="district"
-                  {...register("district")} // Register input
-                  placeholder="Enter district"
+                <Controller
+                  name="district"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      id="district"
+                      value={field.value}
+                      disabled={!watch("province")} // Disable if province is not selected
+                      onValueChange={handleDistrictChange}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select your district" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableDistricts.map((district) => (
+                          <SelectItem key={district.name} value={district.name}>
+                            {district.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 />
                 {errors.district && (
                   <p className="text-red-600 text-sm">
@@ -338,11 +469,29 @@ export function SecurityDetails({
               </div>
 
               <div className="form-section-content">
-                <Label htmlFor="vdcmunicipality">VDC/Municipality</Label>
-                <Input
-                  id="vdcmunicipality"
-                  {...register("vdcmunicipality")} // Register input
-                  placeholder="Enter VDC/Municipality"
+                <Label htmlFor="vdc__municipality">VDC/Municipality</Label>
+                <Controller
+                  name="vdc__municipality"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      id="vdc__municipality"
+                      value={field.value}
+                      disabled={!watch("district")} // Disable if district is not selected
+                      onValueChange={handleMunicipalityChange}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select your municipality" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableMunicipalities.map((municipality) => (
+                          <SelectItem key={municipality} value={municipality}>
+                            {municipality}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 />
                 {errors.vdcmunicipality && (
                   <p className="text-red-600 text-sm">
@@ -357,6 +506,7 @@ export function SecurityDetails({
                   id="ward_no"
                   {...register("ward_no")} // Register input
                   placeholder="Enter ward number"
+                  min="0"
                 />
                 {errors.ward_no && (
                   <p className="text-red-600 text-sm">
@@ -645,14 +795,15 @@ export function SecurityDetails({
         </DialogContent>
       </Dialog>
 
-      {!stepper[3].state && (
-        <div className="form-next-button">
+      {currentStep < totalSteps - 1 && (
+        <div className="flex justify-end mt-8">
           <Button
             type="button"
-            onClick={() => handleStepper(3)}
-            disabled={!isFormComplete}
+            onClick={onNextStep}
+            disabled={!formState.isValid}
+            className="px-8 py-4 text-lg"
           >
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Next →
           </Button>
         </div>
       )}

@@ -32,9 +32,10 @@ import { provinceData, districtsNepali } from "../provincedetails";
 export default function GuarantorDetailsTest({
   retailLoanData,
   setValue,
-  stepper,
-  handleStepper,
-  register,
+  onNextStep,
+  currentStep,
+  totalSteps,
+  formState,
 }) {
   const [guarantors, setGuarantors] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -46,11 +47,11 @@ export default function GuarantorDetailsTest({
   const [isFormComplete, setIsFormComplete] = useState(false);
 
   const [guarantorDetails, setGuarantorDetails] = useState({
+    account_number: "13420002008",
+    phone: "9810126827",
     is_existing_customer: "",
-    account_number: "",
     guarantor_name: "",
     email: "",
-    phone: "",
     date_of_birth: "",
     citizenship_number: "",
     citizenship_issued_date: "",
@@ -69,39 +70,67 @@ export default function GuarantorDetailsTest({
     offsprings: "",
   });
 
-  const [activeProvince, setActiveProvince] = useState("");
-  const [activeDistrict, setActiveDistrict] = useState("");
+  // Updated Province/District/Municipality Handling
   const [availableDistricts, setAvailableDistricts] = useState([]);
   const [availableMunicipalities, setAvailableMunicipalities] = useState([]);
 
-  const onProvinceChange = (value) => {
-    setActiveProvince(value);
-    const provinceDataFound = provinceData.find((p) => p.province === value);
-    setAvailableDistricts(provinceDataFound ? provinceDataFound.districts : []);
-    setActiveDistrict("");
+  // Reset dependent fields when province changes
+  const handleProvinceChange = (value) => {
+    const selectedProvince = provinceData.find((p) => p.province === value);
+    setGuarantorDetails((prev) => ({
+      ...prev,
+      province: value,
+      district: "",
+      vdc__municipality: "",
+    }));
+    setAvailableDistricts(selectedProvince?.districts || []);
     setAvailableMunicipalities([]);
   };
 
-  const onDistrictChange = (value) => {
-    setActiveDistrict(value);
-    const districtDataFound = availableDistricts.find((d) => d.name === value);
-    setAvailableMunicipalities(
-      districtDataFound ? districtDataFound.municipalities : []
-    );
+  // Reset municipality when district changes
+  const handleDistrictChange = (value) => {
+    const selectedDistrict = availableDistricts.find((d) => d.name === value);
+    setGuarantorDetails((prev) => ({
+      ...prev,
+      district: value,
+      vdc__municipality: "",
+    }));
+    setAvailableMunicipalities(selectedDistrict?.municipalities || []);
   };
 
-  const onMunicipalityChange = (value) => {
-    setValue("vdc__municipality", value);
+  // Update municipality selection
+  const handleMunicipalityChange = (value) => {
+    setGuarantorDetails((prev) => ({
+      ...prev,
+      vdc__municipality: value,
+    }));
   };
+
+  useEffect(() => {
+    if (isFormOpen && editingId) {
+      // Rebuild dependency chain when editing existing entry
+      const province = provinceData.find((p) =>
+        p.districts.some((d) => d.name === guarantorDetails.district)
+      );
+
+      if (province) {
+        setAvailableDistricts(province.districts);
+        const district = province.districts.find(
+          (d) => d.name === guarantorDetails.district
+        );
+        setAvailableMunicipalities(district?.municipalities || []);
+      }
+    }
+  }, [isFormOpen, editingId, guarantorDetails.district]);
 
   const handleFetch = () => {
     if (
-      guarantorDetails.account_number == "13420002008" &&
-      guarantorDetails.phone == "9810126827"
+      guarantorDetails.account_number === "13420002008" &&
+      guarantorDetails.phone === "9810126827"
     ) {
       setTimeout(() => {
-        setGuarantorDetails({
-          ...guarantorDetails,
+        // Simulated API response data
+        const apiResponse = {
           guarantor_name: "Jonathan Shrestha",
           email: "johndoe@example.com",
           citizenship_number: "1234567890",
@@ -110,16 +139,23 @@ export default function GuarantorDetailsTest({
           pan_number: "987654321",
           pan_registration_date: "2015-06-12",
           pan_registration_district: "Kathmandu",
-          // province: "Bagmati Province",
-          district: "Kathmandu",
-          vdc__municipality: "Kathmandu",
+          province: "Bagmati Province", // New province data
+          date_of_birth: "2001-01-01",
+          district: "Kathmandu", // New district value
+          vdc__municipality: "Kathmandu", // New VDC/Municipality value
           ward_no: "10",
           grandfathers_name: "Ram Bahadur Shrestha",
           fathers_name: "Shyam Bahadur Shrestha",
           mother_name: "Sita Shrestha",
           spouse_name: "Rita Shrestha",
           offsprings: "2",
-        });
+        };
+
+        // Update the state with the new details
+        setGuarantorDetails((prevDetails) => ({
+          ...prevDetails,
+          ...apiResponse, // Merge with the API response
+        }));
       }, 1000);
     }
   };
@@ -236,7 +272,7 @@ export default function GuarantorDetailsTest({
       person.guarantor_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       person.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
+
   const calculateAge = (dob) => {
     if (!dob) return "";
     const birthDate = new Date(dob);
@@ -305,7 +341,6 @@ export default function GuarantorDetailsTest({
     const hasErrors = Object.keys(errors).length > 0;
     setIsFormComplete(!hasErrors && guarantors.length > 0); // Ensure at least one security is added
   }, [errors, guarantors]);
-
 
   return (
     <Card className="form-section shadow-lg">
@@ -767,17 +802,7 @@ export default function GuarantorDetailsTest({
                       <Select
                         id="province"
                         value={guarantorDetails.province}
-                        onValueChange={(value) => {
-                          handleChange({
-                            target: {
-                              id: "province",
-                              value,
-                            },
-                          });
-                          if (onProvinceChange) {
-                            onProvinceChange(value);
-                          }
-                        }}
+                        onValueChange={handleProvinceChange}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select Province" />
@@ -805,13 +830,8 @@ export default function GuarantorDetailsTest({
                       <Select
                         id="district"
                         value={guarantorDetails.district}
-                        disabled={!activeProvince}
-                        onValueChange={(value) => {
-                          handleChange({
-                            target: { id: "district", value },
-                          });
-                          if (onDistrictChange) onDistrictChange(value);
-                        }}
+                        onValueChange={handleDistrictChange}
+                        // disabled={!guarantorDetails.province}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select your district" />
@@ -841,15 +861,7 @@ export default function GuarantorDetailsTest({
                       <Select
                         id="vdc__municipality"
                         value={guarantorDetails.vdc__municipality}
-                        disabled={!activeDistrict}
-                        onValueChange={(value) => {
-                          handleChange({
-                            target: { id: "vdc__municipality", value },
-                          });
-                          if (onMunicipalityChange) {
-                            onMunicipalityChange(value);
-                          }
-                        }}
+                        onValueChange={handleMunicipalityChange}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select your municipality" />
@@ -900,19 +912,18 @@ export default function GuarantorDetailsTest({
           </form>
         </DialogContent>
       </Dialog>
-      <div className="">
-        {!stepper[1].state && (
-          <div className="form-next-button">
-            <Button
-              type="submit"
-              onClick={() => handleStepper(1)}
-              disabled={!isFormComplete}
-            >
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            </Button>
-          </div>
-        )}
-      </div>
+      {currentStep < totalSteps - 1 && (
+        <div className="flex justify-end mt-8">
+          <Button
+            type="button"
+            onClick={onNextStep}
+            disabled={!formState.isValid}
+            className="px-8 py-4 text-lg"
+          >
+            Next →
+          </Button>
+        </div>
+      )}
     </Card>
   );
 }
